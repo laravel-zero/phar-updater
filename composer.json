@@ -1,5 +1,5 @@
 {
-    "name": "padraic/phar-updater",
+    "name": "laravel-zero/phar-updater",
     "description": "A thing to make PHAR self-updating easy and secure.",
     "type": "library",
     "keywords": ["phar", "self-update", "update", "humbug"],
@@ -20,6 +20,9 @@
     },
     "autoload": {
         "psr-4": { "Humbug\\SelfUpdate\\": "src/" }
+    },
+    "replaces": {
+        "padraic/phar-updater": "1.0.6"
     },
     "extra": {
         "branch-alias": {
