@@ -22,9 +22,9 @@
         "psr-4": { "Humbug\\SelfUpdate\\": "src/" }
     },
     "conflict": {
-        "padraic/phar-updater": "!=1.0.6"
+        "padraic/phar-updater": "*"
     },
-    "replace": {
-        "padraic/phar-updater": "1.0.6"
+    "config": {
+        "sort-packages": true
     }
 }
