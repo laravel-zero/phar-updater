@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": "^7.3",
-        "padraic/humbug_get_contents": "^1.0"
+        "padraic/humbug_get_contents": "^1.1.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.4"
