@@ -24,7 +24,7 @@ class UpdaterTest extends TestCase
 
     private $tmp;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->tmp = sys_get_temp_dir();
         $this->files = __DIR__ . '/_files';
@@ -32,7 +32,7 @@ class UpdaterTest extends TestCase
         $this->updater = new Updater($this->files . '/test.phar');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->deleteTempPhars();
     }

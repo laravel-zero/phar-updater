@@ -26,14 +26,14 @@ class UpdaterGithubStrategyTest extends TestCase
 
     private $data;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->tmp = sys_get_temp_dir();
         $this->files = __DIR__ . '/_files';
         $this->updater = new Updater($this->files . '/test.phar', false, Updater::STRATEGY_GITHUB);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->deleteTempPhars();
     }

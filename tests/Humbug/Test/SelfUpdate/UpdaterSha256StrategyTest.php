@@ -26,14 +26,14 @@ class UpdaterSha256StrategyTest extends TestCase
 
     private $data;
 
-    public function setup()
+    public function setup(): void
     {
         $this->tmp = sys_get_temp_dir();
         $this->files = __DIR__ . '/_files';
         $this->updater = new Updater($this->files . '/test.phar', true, Updater::STRATEGY_SHA256);
     }
 
-    public function teardown()
+    public function teardown(): void
     {
         $this->deleteTempPhars();
     }
