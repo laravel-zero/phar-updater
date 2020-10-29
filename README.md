@@ -3,6 +3,8 @@
 [![StyleCI](https://styleci.io/repos/308408356/shield?style=flat-square)](https://styleci.io/repos/308408356)
 [![Total Downloads](https://img.shields.io/packagist/dt/laravel-zero/phar-updater.png?style=flat-square)](https://packagist.org/packages/laravel-zero/phar-updater)
 
+> This is a fork of the [Humbug PHAR Updater](https://github.com/humbug/phar-updater) for internal use in Laravel Zero.
+
 You have a phar file to distribute, and it's all the rage to include a self-update
 command. Do you really need to write that? Here at Humbug Central, our army of
 minions (all ten of them) have written one for you.
