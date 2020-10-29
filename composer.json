@@ -21,12 +21,10 @@
     "autoload": {
         "psr-4": { "Humbug\\SelfUpdate\\": "src/" }
     },
-    "replaces": {
-        "padraic/phar-updater": "1.0.6"
+    "conflict": {
+        "padraic/phar-updater": "!=1.0.6"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        }
+    "replace": {
+        "padraic/phar-updater": "1.0.6"
     }
 }
