@@ -247,12 +247,14 @@ class Updater
         $path = realpath(dirname($filePath));
         if (!is_dir($path)) {
             throw new FilesystemException(sprintf(
-                'The backup directory does not exist: %s.', $path
+                'The backup directory does not exist: %s.',
+                $path
             ));
         }
         if (!is_writable($path)) {
             throw new FilesystemException(sprintf(
-                'The backup directory is not writeable: %s.', $path
+                'The backup directory is not writeable: %s.',
+                $path
             ));
         }
         $this->backupPath = $filePath;
@@ -278,12 +280,14 @@ class Updater
         $path = realpath(dirname($filePath));
         if (!file_exists($path)) {
             throw new FilesystemException(sprintf(
-                'The restore phar does not exist: %s.', $path
+                'The restore phar does not exist: %s.',
+                $path
             ));
         }
         if (!is_readable($path)) {
             throw new FilesystemException(sprintf(
-                'The restore file is not readable: %s.', $path
+                'The restore file is not readable: %s.',
+                $path
             ));
         }
         $this->restorePath = $filePath;
@@ -387,7 +391,8 @@ class Updater
         $backup = $this->getRestorePharFile();
         if (!file_exists($backup)) {
             throw new RuntimeException(sprintf(
-                'The backup file does not exist: %s.', $backup
+                'The backup file does not exist: %s.',
+                $backup
             ));
         }
         $this->validatePhar($backup);
@@ -411,8 +416,11 @@ class Updater
         }
         return $this->getTempDirectory()
             . '/'
-            . sprintf('%s%s', $this->getLocalPharFileBasename(), $this->getBackupExtension()
-        );
+            . sprintf(
+                '%s%s',
+                $this->getLocalPharFileBasename(),
+                $this->getBackupExtension()
+            );
     }
 
     protected function getTempPubKeyFile()
@@ -431,7 +439,8 @@ class Updater
         }
         if (!file_exists($localPharFile)) {
             throw new RuntimeException(sprintf(
-                'The set phar file does not exist: %s.', $localPharFile
+                'The set phar file does not exist: %s.',
+                $localPharFile
             ));
         }
         if (!is_writable($localPharFile)) {
@@ -449,7 +458,8 @@ class Updater
         $localPubKeyFile = $this->getLocalPharFile() . '.pubkey';
         if (!file_exists($localPubKeyFile)) {
             throw new RuntimeException(sprintf(
-                'The phar pubkey file does not exist: %s.', $localPubKeyFile
+                'The phar pubkey file does not exist: %s.',
+                $localPubKeyFile
             ));
         }
         $this->localPubKeyFile = $localPubKeyFile;
@@ -460,7 +470,8 @@ class Updater
         $tempDirectory = dirname($this->getLocalPharFile());
         if (!is_writable($tempDirectory)) {
             throw new FilesystemException(sprintf(
-                'The directory is not writeable: %s.', $tempDirectory
+                'The directory is not writeable: %s.',
+                $tempDirectory
             ));
         }
         $this->tempDirectory = $tempDirectory;
