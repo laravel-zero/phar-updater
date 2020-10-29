@@ -1,8 +1,7 @@
-PHAR Updater
-============
+# PHAR Updater
 
-[![Build Status](https://travis-ci.org/humbug/phar-updater.svg)](https://travis-ci.org/humbug/phar-updater) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/humbug/phar-updater/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/humbug/phar-updater/?branch=master)
-[![StyleCI](https://styleci.io/repos/31231488/shield?style=flat)](https://styleci.io/repos/31231488) [![Total Downloads](https://poser.pugx.org/padraic/phar-updater/downloads.png)](https://packagist.org/packages/padraic/phar-updater)
+[![StyleCI](https://styleci.io/repos/308408356/shield?style=flat-square)](https://styleci.io/repos/308408356)
+[![Total Downloads](https://img.shields.io/packagist/dt/laravel-zero/phar-updater.png?style=flat-square)](https://packagist.org/packages/laravel-zero/phar-updater)
 
 You have a phar file to distribute, and it's all the rage to include a self-update
 command. Do you really need to write that? Here at Humbug Central, our army of
@@ -27,7 +26,7 @@ minions (all ten of them) have written one for you.
 Introduction
 ============
 
-The `padraic/phar-updater` package has the following features:
+The `laravel-zero/phar-updater` package has the following features:
 
 * Full support for SSL/TLS verification.
 * Support for OpenSSL phar signatures.
@@ -35,14 +34,13 @@ The `padraic/phar-updater` package has the following features:
 * Support for SHA-1 version synchronisation and Github Releases as update strategies.
 
 Apart from the detailed documentation below, you can find the package being used
-in almost every possible way within [Humbug's self-update command](https://github.com/padraic/humbug/blob/master/src/Command/SelfUpdate.php) as part of a `Symfony Console`
-based PHAR which you may freely reuse.
+ within [Laravel Zero's self-update component](https://github.com/laravel-zero/framework/blob/master/src/Components/Updater).
 
 Installation
 ============
 
 ```
-composer require padraic/phar-updater
+composer require laravel-zero/phar-updater
 ```
 
 The package utilises PHP Streams for remote requests so it will require the openssl
