@@ -13,7 +13,7 @@ namespace Humbug\Test\SelfUpdate;
 
 use Humbug\SelfUpdate\VersionParser;
 
-class VersionParserTest extends \PHPUnit_Framework_TestCase
+class VersionParserTest extends \PHPUnit\Framework\TestCase
 {
 
     // Stable Versions
