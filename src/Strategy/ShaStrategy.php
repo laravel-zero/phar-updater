@@ -36,7 +36,8 @@ class ShaStrategy extends ShaStrategyAbstract
         restore_error_handler();
         if (false === $version) {
             throw new HttpRequestException(sprintf(
-                'Request to URL failed: %s', $this->getVersionUrl()
+                'Request to URL failed: %s',
+                $this->getVersionUrl()
             ));
         }
         if (empty($version)) {

@@ -73,7 +73,8 @@ class GithubStrategy implements StrategyInterface
         restore_error_handler();
         if (false === $result) {
             throw new HttpRequestException(sprintf(
-                'Request to URL failed: %s', $this->remoteUrl
+                'Request to URL failed: %s',
+                $this->remoteUrl
             ));
         }
 
