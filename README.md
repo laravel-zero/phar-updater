@@ -25,11 +25,10 @@ minions (all ten of them) have written one for you.
     - [Avoid Post Update File Includes](#avoid-post-update-file-includes)
     - [Custom Update Strategies](#custom-update-strategies)
 - [Update Strategies](#update-strategies)
-    - [SHA-1 Hash Synchronisation](sha-1-hash-synchronisation)
+    - [SHA-1 Hash Synchronisation](#sha-1-hash-synchronisation)
     - [Github Releases](#github-releases)
 
-Introduction
-============
+## Introduction
 
 The `laravel-zero/phar-updater` package has the following features:
 
@@ -41,8 +40,7 @@ The `laravel-zero/phar-updater` package has the following features:
 Apart from the detailed documentation below, you can find the package being used
  within [Laravel Zero's self-update component](https://github.com/laravel-zero/framework/blob/master/src/Components/Updater).
 
-Installation
-============
+## Installation
 
 ```
 composer require laravel-zero/phar-updater
@@ -52,8 +50,7 @@ The package utilises PHP Streams for remote requests so it will require the open
 extension and the `allow_url_open` setting to both be enabled. Support for curl
 will follow in time.
 
-Usage
-=====
+## Usage
 
 The default update strategy uses an SHA-1 hash of the current remote phar in a
 version file, and will update the local phar when this version is changed. There
@@ -327,11 +324,9 @@ $updater->setStrategyObject(new MyStrategy);
 The similar `setStrategy()` method is solely used to pass flags matching internal
 strategies.
 
-Update Strategies
-=================
+## Update Strategies
 
-SHA-1 Hash Synchronisation
---------------------------
+### SHA-1 Hash Synchronisation
 
 The phar-updater package only (that will change!) supports an update strategy
 where phars are updated according to the SHA-1 hash of the current phar file
@@ -347,7 +342,7 @@ The `myname.version` contains the SHA-1 hash of the most recently built phar whe
 the hash is the very first string (if not the only string). You can generate this
 quite easily from bash using:
 
-```sh
+```bash
 sha1sum myname.phar > myname.version
 ```
 
@@ -368,8 +363,7 @@ The openssl signing has no mechanism such as a central authority or a browser's 
 certificate stash with which to automate such key changes in a safe manner.
 
 
-Github Releases
----------------
+### Github Releases
 
 When tagging new versions on Github, these are created and hosted as `Github Releases`
 which allow you to attach a changelog and additional file downloads. Using this
