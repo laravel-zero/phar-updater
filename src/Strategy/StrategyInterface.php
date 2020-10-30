@@ -16,7 +16,6 @@ use Humbug\SelfUpdate\Updater;
 
 interface StrategyInterface
 {
-
     /**
      * Download the remote Phar file.
      *

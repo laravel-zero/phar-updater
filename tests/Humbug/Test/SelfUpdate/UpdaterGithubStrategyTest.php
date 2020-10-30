@@ -13,10 +13,10 @@ namespace Humbug\Test\SelfUpdate;
 
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
+use PHPUnit\Framework\TestCase;
 
-class UpdaterGithubStrategyTest extends \PHPUnit\Framework\TestCase
+class UpdaterGithubStrategyTest extends TestCase
 {
-
     private $files;
 
     /** @var Updater */

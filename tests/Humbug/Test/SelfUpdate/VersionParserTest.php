@@ -12,10 +12,10 @@
 namespace Humbug\Test\SelfUpdate;
 
 use Humbug\SelfUpdate\VersionParser;
+use PHPUnit\Framework\TestCase;
 
-class VersionParserTest extends \PHPUnit\Framework\TestCase
+class VersionParserTest extends TestCase
 {
-
     // Stable Versions
 
     public function testShouldSelectNothingFromUnstablesIfStableRequested()
