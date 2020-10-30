@@ -11,6 +11,8 @@
 
 namespace Humbug\Test\SelfUpdate;
 
+use Humbug\SelfUpdate\Exception\HttpRequestException;
+use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\Strategy\Sha256Strategy;
 use PHPUnit\Framework\TestCase;
@@ -66,7 +68,7 @@ class UpdaterSha256StrategyTest extends TestCase
 
     public function testSetPharUrlThrowsExceptionOnInvalidUrl()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setPharUrl('silly:///home/padraic');
     }
 
@@ -81,7 +83,7 @@ class UpdaterSha256StrategyTest extends TestCase
 
     public function testSetVersionUrlThrowsExceptionOnInvalidUrl()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setVersionUrl('silly:///home/padraic');
     }
 
@@ -101,7 +103,7 @@ class UpdaterSha256StrategyTest extends TestCase
 
     public function testThrowsExceptionOnEmptyRemoteVersion()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\HttpRequestException::class);
+        $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned empty response');
         $this->updater->getStrategy()->setVersionUrl('file://' . $this->files . '/empty.version');
         $this->assertTrue($this->updater->hasUpdate());
@@ -109,7 +111,7 @@ class UpdaterSha256StrategyTest extends TestCase
 
     public function testThrowsExceptionOnInvalidRemoteVersion()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\HttpRequestException::class);
+        $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned incorrectly formatted response');
         $this->updater->getStrategy()->setVersionUrl('file://' . $this->files . '/bad.version');
         $this->assertTrue($this->updater->hasUpdate());

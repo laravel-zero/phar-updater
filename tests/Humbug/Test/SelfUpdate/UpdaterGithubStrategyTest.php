@@ -11,6 +11,7 @@
 
 namespace Humbug\Test\SelfUpdate;
 
+use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use PHPUnit\Framework\TestCase;
@@ -88,7 +89,7 @@ class UpdaterGithubStrategyTest extends TestCase
 
     public function testSetStabilityThrowsExceptionOnInvalidStabilityValue()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setStability('foo');
     }
 

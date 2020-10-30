@@ -11,9 +11,13 @@
 
 namespace Humbug\Test\SelfUpdate;
 
+use Humbug\SelfUpdate\Exception\HttpRequestException;
+use Humbug\SelfUpdate\Exception\InvalidArgumentException;
+use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 class UpdaterTest extends TestCase
 {
@@ -59,7 +63,7 @@ class UpdaterTest extends TestCase
 
     public function testConstructorThrowsExceptionIfPubKeyNotExistsButFlagTrue()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $updater = new Updater($this->files . '/test-nopubkey.phar');
     }
 
@@ -80,7 +84,7 @@ class UpdaterTest extends TestCase
 
     public function testSetPharUrlThrowsExceptionOnInvalidUrl()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setPharUrl('silly:///home/padraic');
     }
 
@@ -95,7 +99,7 @@ class UpdaterTest extends TestCase
 
     public function testSetVersionUrlThrowsExceptionOnInvalidUrl()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setVersionUrl('silly:///home/padraic');
     }
 
@@ -109,7 +113,7 @@ class UpdaterTest extends TestCase
 
     public function testThrowsExceptionOnEmptyRemoteVersion()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\HttpRequestException::class);
+        $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned empty response');
         $this->updater->getStrategy()->setVersionUrl('file://' . $this->files . '/empty.version');
         $this->assertTrue($this->updater->hasUpdate());
@@ -117,7 +121,7 @@ class UpdaterTest extends TestCase
 
     public function testThrowsExceptionOnInvalidRemoteVersion()
     {
-        $this->expectException(\Humbug\SelfUpdate\Exception\HttpRequestException::class);
+        $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned incorrectly formatted response');
         $this->updater->getStrategy()->setVersionUrl('file://' . $this->files . '/bad.version');
         $this->assertTrue($this->updater->hasUpdate());
@@ -156,7 +160,7 @@ class UpdaterTest extends TestCase
         $updater->getStrategy()->setPharUrl('file://' . $this->files . '/build/new.phar');
         $updater->getStrategy()->setVersionUrl('file://' . $this->files . '/build/new.version');
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $updater->update();
     }
 
@@ -183,7 +187,7 @@ class UpdaterTest extends TestCase
         $this->assertEquals('old', $this->getPharOutput($this->tmp . '/old.phar'));
 
         /** Signature check should fail with invalid signature by a different privkey */
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
 
         $updater = new Updater($this->tmp . '/old.phar');
         $updater->getStrategy()->setPharUrl('file://' . $this->files . '/build/badsig.phar');
@@ -202,7 +206,7 @@ class UpdaterTest extends TestCase
         $updater->getStrategy()->setVersionUrl('file://' . $this->files . '/build/nosig.version');
 
         /** If newly download phar lacks an expected signature, an exception should be thrown */
-        $this->expectException(\Humbug\SelfUpdate\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $updater->update();
     }
 
