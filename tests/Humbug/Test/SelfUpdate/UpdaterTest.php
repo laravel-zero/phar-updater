@@ -62,22 +62,22 @@ class UpdaterTest extends TestCase
     public function testConstructorThrowsExceptionIfPubKeyNotExistsButFlagTrue(): void
     {
         $this->expectException(RuntimeException::class);
-        $updater = new Updater($this->files.'/test-nopubkey.phar');
+        new Updater($this->files.'/test-nopubkey.phar');
     }
 
     public function testConstructorAncilliaryValues(): void
     {
-        $this->assertEquals($this->updater->getLocalPharFileBasename(), 'test');
+        $this->assertEquals('test', $this->updater->getLocalPharFileBasename());
         $this->assertEquals($this->updater->getTempDirectory(), $this->files);
     }
 
     public function testSetPharUrlWithUrl(): void
     {
         $this->updater->getStrategy()->setPharUrl('http://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getPharUrl(), 'http://www.example.com');
+        $this->assertEquals('http://www.example.com', $this->updater->getStrategy()->getPharUrl());
 
         $this->updater->getStrategy()->setPharUrl('https://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getPharUrl(), 'https://www.example.com');
+        $this->assertEquals('https://www.example.com', $this->updater->getStrategy()->getPharUrl());
     }
 
     public function testSetPharUrlThrowsExceptionOnInvalidUrl(): void
@@ -89,10 +89,10 @@ class UpdaterTest extends TestCase
     public function testSetVersionUrlWithUrl(): void
     {
         $this->updater->getStrategy()->setVersionUrl('http://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getVersionUrl(), 'http://www.example.com');
+        $this->assertEquals('http://www.example.com', $this->updater->getStrategy()->getVersionUrl());
 
         $this->updater->getStrategy()->setVersionUrl('https://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getVersionUrl(), 'https://www.example.com');
+        $this->assertEquals('https://www.example.com', $this->updater->getStrategy()->getVersionUrl());
     }
 
     public function testSetVersionUrlThrowsExceptionOnInvalidUrl(): void
@@ -232,7 +232,7 @@ class UpdaterTest extends TestCase
     public function testCanSetCustomStrategyObjects(): void
     {
         $this->updater->setStrategyObject(new FooStrategy);
-        $this->assertTrue($this->updater->getStrategy() instanceof FooStrategy);
+        $this->assertInstanceOf(FooStrategy::class, $this->updater->getStrategy());
     }
 
     // Helpers
