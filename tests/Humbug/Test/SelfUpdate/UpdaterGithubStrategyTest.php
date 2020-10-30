@@ -23,8 +23,6 @@ class UpdaterGithubStrategyTest extends TestCase
 
     private $tmp;
 
-    private $data;
-
     public function setUp(): void
     {
         $this->tmp = sys_get_temp_dir();
@@ -37,15 +35,13 @@ class UpdaterGithubStrategyTest extends TestCase
         $this->deleteTempPhars();
     }
 
-    public function testConstruction()
+    public function testConstruction(): void
     {
         $updater = new Updater(null, false, Updater::STRATEGY_GITHUB);
-        $this->assertTrue(
-            $updater->getStrategy() instanceof GithubStrategy
-        );
+        $this->assertInstanceOf(GithubStrategy::class, $updater->getStrategy());
     }
 
-    public function testSetCurrentLocalVersion()
+    public function testSetCurrentLocalVersion(): void
     {
         $this->updater->getStrategy()->setCurrentLocalVersion('1.0');
         $this->assertEquals(
@@ -54,7 +50,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetPharName()
+    public function testSetPharName(): void
     {
         $this->updater->getStrategy()->setPharName('foo.phar');
         $this->assertEquals(
@@ -63,7 +59,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetPackageName()
+    public function testSetPackageName(): void
     {
         $this->updater->getStrategy()->setPackageName('foo/bar');
         $this->assertEquals(
@@ -72,7 +68,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetStability()
+    public function testSetStability(): void
     {
         $this->assertEquals(
             'stable',
@@ -85,7 +81,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetStabilityThrowsExceptionOnInvalidStabilityValue()
+    public function testSetStabilityThrowsExceptionOnInvalidStabilityValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setStability('foo');
@@ -94,7 +90,7 @@ class UpdaterGithubStrategyTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePhar()
+    public function testUpdatePhar(): void
     {
         if (! extension_loaded('openssl')) {
             $this->markTestSkipped('This test requires the openssl extension to run.');
@@ -113,15 +109,14 @@ class UpdaterGithubStrategyTest extends TestCase
         $this->assertEquals('new', $this->getPharOutput($this->tmp.'/old.phar'));
     }
 
-    /**
-     * Helpers.
-     */
-    private function getPharOutput($path)
+    // Helpers
+
+    private function getPharOutput(string $path): string
     {
         return exec('php '.escapeshellarg($path));
     }
 
-    private function deleteTempPhars()
+    private function deleteTempPhars(): void
     {
         @unlink($this->tmp.'/old.phar');
         @unlink($this->tmp.'/old.phar.pubkey');
@@ -131,7 +126,7 @@ class UpdaterGithubStrategyTest extends TestCase
         @unlink($this->tmp.'/packages.json');
     }
 
-    private function createTestPharAndKey()
+    private function createTestPharAndKey(): void
     {
         copy($this->files.'/build/old.phar', $this->tmp.'/old.phar');
         chmod($this->tmp.'/old.phar', 0755);
@@ -159,7 +154,7 @@ class UpdaterGithubStrategyTest extends TestCase
 
 class GithubTestStrategy extends GithubStrategy
 {
-    protected function getApiUrl()
+    protected function getApiUrl(): string
     {
         return 'file://'.sys_get_temp_dir().'/packages.json';
     }
