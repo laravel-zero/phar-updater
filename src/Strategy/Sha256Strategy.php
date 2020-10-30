@@ -1,9 +1,8 @@
 <?php
 /**
- * Humbug
+ * Humbug.
  *
  * @category   Humbug
- * @package    Humbug
  * @copyright  Copyright (c) 2017 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -12,9 +11,9 @@
 
 namespace Humbug\SelfUpdate\Strategy;
 
+use function file_get_contents;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Updater;
-use function file_get_contents;
 
 final class Sha256Strategy extends ShaStrategyAbstract
 {
@@ -27,7 +26,7 @@ final class Sha256Strategy extends ShaStrategyAbstract
     public function getCurrentRemoteVersion(Updater $updater)
     {
         /** Switch remote request errors to HttpRequestExceptions */
-        set_error_handler(array($updater, 'throwHttpRequestException'));
+        set_error_handler([$updater, 'throwHttpRequestException']);
         $version = file_get_contents($this->getVersionUrl());
         restore_error_handler();
         if (false === $version) {
@@ -41,7 +40,7 @@ final class Sha256Strategy extends ShaStrategyAbstract
                 'Version request returned empty response.'
             );
         }
-        if (!preg_match('%^[a-z0-9]{64}%', $version, $matches)) {
+        if (! preg_match('%^[a-z0-9]{64}%', $version, $matches)) {
             throw new HttpRequestException(
                 'Version request returned incorrectly formatted response.'
             );
