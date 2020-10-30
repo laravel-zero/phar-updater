@@ -98,7 +98,7 @@ class Updater
      */
     public function __construct($localPharFile = null, $hasPubKey = true, $strategy = self::STRATEGY_SHA1)
     {
-        ini_set('phar.require_hash', 1);
+        ini_set('phar.require_hash', '1');
         $this->setLocalPharFile($localPharFile);
         if (! is_bool($hasPubKey)) {
             throw new InvalidArgumentException(
@@ -271,7 +271,7 @@ class Updater
     /**
      * Get backup path for old phar versions.
      *
-     * @return string
+     * @return string|null
      */
     public function getBackupPath()
     {
@@ -304,7 +304,7 @@ class Updater
     /**
      * Get path for the backup phar to rollback/restore from.
      *
-     * @return string
+     * @return string|null
      */
     public function getRestorePath()
     {
