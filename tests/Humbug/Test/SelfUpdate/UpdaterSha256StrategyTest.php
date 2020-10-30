@@ -24,8 +24,6 @@ class UpdaterSha256StrategyTest extends TestCase
 
     private $tmp;
 
-    private $data;
-
     public function setup(): void
     {
         $this->tmp = sys_get_temp_dir();
@@ -38,15 +36,13 @@ class UpdaterSha256StrategyTest extends TestCase
         $this->deleteTempPhars();
     }
 
-    public function testConstruction()
+    public function testConstruction(): void
     {
         $updater = new Updater(null, false, Updater::STRATEGY_SHA256);
-        $this->assertTrue(
-            $updater->getStrategy() instanceof Sha256Strategy
-        );
+        $this->assertInstanceOf(Sha256Strategy::class, $updater->getStrategy());
     }
 
-    public function testGetCurrentLocalVersion()
+    public function testGetCurrentLocalVersion(): void
     {
         $this->assertEquals(
             'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
@@ -54,37 +50,37 @@ class UpdaterSha256StrategyTest extends TestCase
         );
     }
 
-    public function testSetPharUrlWithUrl()
+    public function testSetPharUrlWithUrl(): void
     {
         $this->updater->getStrategy()->setPharUrl('http://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getPharUrl(), 'http://www.example.com');
+        $this->assertEquals('http://www.example.com', $this->updater->getStrategy()->getPharUrl());
 
         $this->updater->getStrategy()->setPharUrl('https://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getPharUrl(), 'https://www.example.com');
+        $this->assertEquals('https://www.example.com', $this->updater->getStrategy()->getPharUrl());
     }
 
-    public function testSetPharUrlThrowsExceptionOnInvalidUrl()
+    public function testSetPharUrlThrowsExceptionOnInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setPharUrl('silly:///home/padraic');
     }
 
-    public function testSetVersionUrlWithUrl()
+    public function testSetVersionUrlWithUrl(): void
     {
         $this->updater->getStrategy()->setVersionUrl('http://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getVersionUrl(), 'http://www.example.com');
+        $this->assertEquals('http://www.example.com', $this->updater->getStrategy()->getVersionUrl());
 
         $this->updater->getStrategy()->setVersionUrl('https://www.example.com');
-        $this->assertEquals($this->updater->getStrategy()->getVersionUrl(), 'https://www.example.com');
+        $this->assertEquals('https://www.example.com', $this->updater->getStrategy()->getVersionUrl());
     }
 
-    public function testSetVersionUrlThrowsExceptionOnInvalidUrl()
+    public function testSetVersionUrlThrowsExceptionOnInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setVersionUrl('silly:///home/padraic');
     }
 
-    public function testCanDetectNewRemoteVersionAndStoreVersions()
+    public function testCanDetectNewRemoteVersionAndStoreVersions(): void
     {
         $this->updater->getStrategy()->setVersionUrl('file://'.$this->files.'/good.sha256.version');
         $this->assertTrue($this->updater->hasUpdate());
@@ -98,7 +94,7 @@ class UpdaterSha256StrategyTest extends TestCase
         );
     }
 
-    public function testThrowsExceptionOnEmptyRemoteVersion()
+    public function testThrowsExceptionOnEmptyRemoteVersion(): void
     {
         $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned empty response');
@@ -106,7 +102,7 @@ class UpdaterSha256StrategyTest extends TestCase
         $this->assertTrue($this->updater->hasUpdate());
     }
 
-    public function testThrowsExceptionOnInvalidRemoteVersion()
+    public function testThrowsExceptionOnInvalidRemoteVersion(): void
     {
         $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned incorrectly formatted response');
@@ -117,7 +113,7 @@ class UpdaterSha256StrategyTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePhar()
+    public function testUpdatePhar(): void
     {
         $this->createTestPharAndKey();
         $this->assertEquals('old', $this->getPharOutput($this->tmp.'/old.phar'));
@@ -129,15 +125,14 @@ class UpdaterSha256StrategyTest extends TestCase
         $this->assertEquals('new', $this->getPharOutput($this->tmp.'/old.phar'));
     }
 
-    /**
-     * Helpers.
-     */
-    private function getPharOutput($path)
+    // Helpers
+
+    private function getPharOutput(string $path): string
     {
         return exec('php '.escapeshellarg($path));
     }
 
-    private function deleteTempPhars()
+    private function deleteTempPhars(): void
     {
         @unlink($this->tmp.'/old.phar');
         @unlink($this->tmp.'/old.phar.pubkey');
@@ -145,7 +140,7 @@ class UpdaterSha256StrategyTest extends TestCase
         @unlink($this->tmp.'/old-old.phar');
     }
 
-    private function createTestPharAndKey()
+    private function createTestPharAndKey(): void
     {
         copy($this->files.'/build/old.phar', $this->tmp.'/old.phar');
         chmod($this->tmp.'/old.phar', 0755);

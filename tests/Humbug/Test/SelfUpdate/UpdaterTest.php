@@ -39,7 +39,7 @@ class UpdaterTest extends TestCase
         $this->deleteTempPhars();
     }
 
-    public function testConstruction()
+    public function testConstruction(): void
     {
         // with key
         $updater = new Updater($this->files.'/test.phar');
@@ -59,19 +59,19 @@ class UpdaterTest extends TestCase
         );
     }
 
-    public function testConstructorThrowsExceptionIfPubKeyNotExistsButFlagTrue()
+    public function testConstructorThrowsExceptionIfPubKeyNotExistsButFlagTrue(): void
     {
         $this->expectException(RuntimeException::class);
         $updater = new Updater($this->files.'/test-nopubkey.phar');
     }
 
-    public function testConstructorAncilliaryValues()
+    public function testConstructorAncilliaryValues(): void
     {
         $this->assertEquals($this->updater->getLocalPharFileBasename(), 'test');
         $this->assertEquals($this->updater->getTempDirectory(), $this->files);
     }
 
-    public function testSetPharUrlWithUrl()
+    public function testSetPharUrlWithUrl(): void
     {
         $this->updater->getStrategy()->setPharUrl('http://www.example.com');
         $this->assertEquals($this->updater->getStrategy()->getPharUrl(), 'http://www.example.com');
@@ -80,13 +80,13 @@ class UpdaterTest extends TestCase
         $this->assertEquals($this->updater->getStrategy()->getPharUrl(), 'https://www.example.com');
     }
 
-    public function testSetPharUrlThrowsExceptionOnInvalidUrl()
+    public function testSetPharUrlThrowsExceptionOnInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setPharUrl('silly:///home/padraic');
     }
 
-    public function testSetVersionUrlWithUrl()
+    public function testSetVersionUrlWithUrl(): void
     {
         $this->updater->getStrategy()->setVersionUrl('http://www.example.com');
         $this->assertEquals($this->updater->getStrategy()->getVersionUrl(), 'http://www.example.com');
@@ -95,13 +95,13 @@ class UpdaterTest extends TestCase
         $this->assertEquals($this->updater->getStrategy()->getVersionUrl(), 'https://www.example.com');
     }
 
-    public function testSetVersionUrlThrowsExceptionOnInvalidUrl()
+    public function testSetVersionUrlThrowsExceptionOnInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setVersionUrl('silly:///home/padraic');
     }
 
-    public function testCanDetectNewRemoteVersionAndStoreVersions()
+    public function testCanDetectNewRemoteVersionAndStoreVersions(): void
     {
         $this->updater->getStrategy()->setVersionUrl('file://'.$this->files.'/good.version');
         $this->assertTrue($this->updater->hasUpdate());
@@ -109,7 +109,7 @@ class UpdaterTest extends TestCase
         $this->assertEquals('1af1b9c94dea1ff337587bfa9109f1dad1ec7b9b', $this->updater->getNewVersion());
     }
 
-    public function testThrowsExceptionOnEmptyRemoteVersion()
+    public function testThrowsExceptionOnEmptyRemoteVersion(): void
     {
         $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned empty response');
@@ -117,7 +117,7 @@ class UpdaterTest extends TestCase
         $this->assertTrue($this->updater->hasUpdate());
     }
 
-    public function testThrowsExceptionOnInvalidRemoteVersion()
+    public function testThrowsExceptionOnInvalidRemoteVersion(): void
     {
         $this->expectException(HttpRequestException::class);
         $this->expectExceptionMessage('Version request returned incorrectly formatted response');
@@ -128,7 +128,7 @@ class UpdaterTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePhar()
+    public function testUpdatePhar(): void
     {
         if (! extension_loaded('openssl')) {
             $this->markTestSkipped('This test requires the openssl extension to run.');
@@ -147,7 +147,7 @@ class UpdaterTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePharFailsIfCurrentPublicKeyEmpty()
+    public function testUpdatePharFailsIfCurrentPublicKeyEmpty(): void
     {
         //$this->markTestSkipped('Segmentation fault at present under PHP');
         copy($this->files.'/build/badkey.phar', $this->tmp.'/old.phar');
@@ -165,7 +165,7 @@ class UpdaterTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePharFailsIfCurrentPublicKeyInvalid()
+    public function testUpdatePharFailsIfCurrentPublicKeyInvalid(): void
     {
         $this->markTestIncomplete('Segmentation fault at present under PHP');
         /** Should be similar to testUpdatePharFailsIfCurrentPublicKeyEmpty with
@@ -175,7 +175,7 @@ class UpdaterTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePharFailsOnExpectedSignatureMismatch()
+    public function testUpdatePharFailsOnExpectedSignatureMismatch(): void
     {
         if (! extension_loaded('openssl')) {
             $this->markTestSkipped('This test requires the openssl extension to run.');
@@ -196,7 +196,7 @@ class UpdaterTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePharFailsIfDownloadPharIsUnsignedWhenExpected()
+    public function testUpdatePharFailsIfDownloadPharIsUnsignedWhenExpected(): void
     {
         $this->createTestPharAndKey();
         $updater = new Updater($this->tmp.'/old.phar');
@@ -208,7 +208,7 @@ class UpdaterTest extends TestCase
         $updater->update();
     }
 
-    public function testSetBackupPathSetsThePathWhenTheDirectoryExistsAndIsWriteable()
+    public function testSetBackupPathSetsThePathWhenTheDirectoryExistsAndIsWriteable(): void
     {
         $this->createTestPharAndKey();
         $updater = new Updater($this->tmp.'/old.phar');
@@ -217,7 +217,7 @@ class UpdaterTest extends TestCase
         $this->assertEquals($this->tmp.'/backup.phar', $res);
     }
 
-    public function testSetRestorePathSetsThePathWhenTheDirectoryExistsAndIsWriteable()
+    public function testSetRestorePathSetsThePathWhenTheDirectoryExistsAndIsWriteable(): void
     {
         $this->createTestPharAndKey();
         $updater = new Updater($this->tmp.'/old.phar');
@@ -229,28 +229,27 @@ class UpdaterTest extends TestCase
     /**
      * Custom Strategies.
      */
-    public function testCanSetCustomStrategyObjects()
+    public function testCanSetCustomStrategyObjects(): void
     {
         $this->updater->setStrategyObject(new FooStrategy);
         $this->assertTrue($this->updater->getStrategy() instanceof FooStrategy);
     }
 
-    /**
-     * Helpers.
-     */
-    private function getPharOutput($path)
+    // Helpers
+
+    private function getPharOutput(string $path): string
     {
         return exec('php '.escapeshellarg($path));
     }
 
-    private function deleteTempPhars()
+    private function deleteTempPhars(): void
     {
         @unlink($this->tmp.'/old.phar');
         @unlink($this->tmp.'/old.phar.pubkey');
         @unlink($this->tmp.'/old.1c7049180abee67826d35ce308c38272242b64b8.phar');
     }
 
-    private function createTestPharAndKey()
+    private function createTestPharAndKey(): void
     {
         copy($this->files.'/build/old.phar', $this->tmp.'/old.phar');
         chmod($this->tmp.'/old.phar', 0755);
