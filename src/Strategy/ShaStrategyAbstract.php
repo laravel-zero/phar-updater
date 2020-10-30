@@ -15,7 +15,7 @@ namespace Humbug\SelfUpdate\Strategy;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Updater;
-use function Humbug\get_contents;
+use function file_get_contents;
 
 abstract class ShaStrategyAbstract implements StrategyInterface
 {
@@ -46,7 +46,7 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler(array($updater, 'throwHttpRequestException'));
-        $result = get_contents($this->getPharUrl());
+        $result = file_get_contents($this->getPharUrl());
         restore_error_handler();
         if (false === $result) {
             throw new HttpRequestException(sprintf(
