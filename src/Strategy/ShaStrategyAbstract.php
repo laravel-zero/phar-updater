@@ -1,9 +1,8 @@
 <?php
 /**
- * Humbug
+ * Humbug.
  *
  * @category   Humbug
- * @package    Humbug
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -12,10 +11,10 @@
 
 namespace Humbug\SelfUpdate\Strategy;
 
+use function file_get_contents;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Updater;
-use function file_get_contents;
 
 abstract class ShaStrategyAbstract implements StrategyInterface
 {
@@ -45,7 +44,7 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     public function download(Updater $updater)
     {
         /** Switch remote request errors to HttpRequestExceptions */
-        set_error_handler(array($updater, 'throwHttpRequestException'));
+        set_error_handler([$updater, 'throwHttpRequestException']);
         $result = file_get_contents($this->getPharUrl());
         restore_error_handler();
         if (false === $result) {
@@ -59,13 +58,13 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     }
 
     /**
-     * Set URL to phar file
+     * Set URL to phar file.
      *
      * @param string $url
      */
     public function setPharUrl($url)
     {
-        if (!$this->validateAllowedUrl($url)) {
+        if (! $this->validateAllowedUrl($url)) {
             throw new InvalidArgumentException(
                 sprintf('Invalid url passed as argument: %s.', $url)
             );
@@ -74,7 +73,7 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     }
 
     /**
-     * Get URL for phar file
+     * Get URL for phar file.
      *
      * @return string
      */
@@ -84,13 +83,13 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     }
 
     /**
-     * Set URL to version file
+     * Set URL to version file.
      *
      * @param string $url
      */
     public function setVersionUrl($url)
     {
-        if (!$this->validateAllowedUrl($url)) {
+        if (! $this->validateAllowedUrl($url)) {
             throw new InvalidArgumentException(
                 sprintf('Invalid url passed as argument: %s.', $url)
             );
@@ -99,7 +98,7 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     }
 
     /**
-     * Get URL for version file
+     * Get URL for version file.
      *
      * @return string
      */
@@ -110,9 +109,8 @@ abstract class ShaStrategyAbstract implements StrategyInterface
 
     protected function validateAllowedUrl($url)
     {
-        return (
+        return
             filter_var($url, FILTER_VALIDATE_URL)
-            && in_array(parse_url($url, PHP_URL_SCHEME), self::SUPPORTED_SCHEMES)
-        );
+            && in_array(parse_url($url, PHP_URL_SCHEME), self::SUPPORTED_SCHEMES);
     }
 }

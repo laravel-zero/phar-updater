@@ -1,9 +1,8 @@
 <?php
 /**
- * Humbug
+ * Humbug.
  *
  * @category   Humbug
- * @package    Humbug
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -12,12 +11,12 @@
 
 namespace Humbug\SelfUpdate\Strategy;
 
-use Humbug\SelfUpdate\Updater;
-use Humbug\SelfUpdate\VersionParser;
+use function file_get_contents;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\JsonParsingException;
-use function file_get_contents;
+use Humbug\SelfUpdate\Updater;
+use Humbug\SelfUpdate\VersionParser;
 
 class GithubStrategy implements StrategyInterface
 {
@@ -68,7 +67,7 @@ class GithubStrategy implements StrategyInterface
     public function download(Updater $updater)
     {
         /** Switch remote request errors to HttpRequestExceptions */
-        set_error_handler(array($updater, 'throwHttpRequestException'));
+        set_error_handler([$updater, 'throwHttpRequestException']);
         $result = file_get_contents($this->remoteUrl);
         restore_error_handler();
         if (false === $result) {
@@ -90,7 +89,7 @@ class GithubStrategy implements StrategyInterface
     public function getCurrentRemoteVersion(Updater $updater)
     {
         /** Switch remote request errors to HttpRequestExceptions */
-        set_error_handler(array($updater, 'throwHttpRequestException'));
+        set_error_handler([$updater, 'throwHttpRequestException']);
         $packageUrl = $this->getApiUrl();
         $package = json_decode(file_get_contents($packageUrl), true);
         restore_error_handler();
@@ -98,7 +97,7 @@ class GithubStrategy implements StrategyInterface
         if (null === $package || json_last_error() !== JSON_ERROR_NONE) {
             throw new JsonParsingException(
                 'Error parsing JSON package data'
-                . (function_exists('json_last_error_msg') ? ': ' . json_last_error_msg() : '')
+                .(function_exists('json_last_error_msg') ? ': '.json_last_error_msg() : '')
             );
         }
 
@@ -113,9 +112,9 @@ class GithubStrategy implements StrategyInterface
         }
 
         /**
-         * Setup remote URL if there's an actual version to download
+         * Setup remote URL if there's an actual version to download.
          */
-        if (!empty($this->remoteVersion)) {
+        if (! empty($this->remoteVersion)) {
             $this->remoteUrl = $this->getDownloadUrl($package);
         }
 
@@ -134,7 +133,7 @@ class GithubStrategy implements StrategyInterface
     }
 
     /**
-     * Set version string of the local phar
+     * Set version string of the local phar.
      *
      * @param string $version
      */
@@ -144,7 +143,7 @@ class GithubStrategy implements StrategyInterface
     }
 
     /**
-     * Set Package name
+     * Set Package name.
      *
      * @param string $name
      */
@@ -154,7 +153,7 @@ class GithubStrategy implements StrategyInterface
     }
 
     /**
-     * Get Package name
+     * Get Package name.
      *
      * @return string
      */
@@ -164,7 +163,7 @@ class GithubStrategy implements StrategyInterface
     }
 
     /**
-     * Set phar file's name
+     * Set phar file's name.
      *
      * @param string $name
      */
@@ -174,7 +173,7 @@ class GithubStrategy implements StrategyInterface
     }
 
     /**
-     * Get phar file's name
+     * Get phar file's name.
      *
      * @return string
      */
@@ -184,7 +183,7 @@ class GithubStrategy implements StrategyInterface
     }
 
     /**
-     * Set target stability
+     * Set target stability.
      *
      * @param string $stability
      */
@@ -199,7 +198,7 @@ class GithubStrategy implements StrategyInterface
     }
 
     /**
-     * Get target stability
+     * Get target stability.
      *
      * @return string
      */
@@ -226,6 +225,7 @@ class GithubStrategy implements StrategyInterface
             $this->remoteVersion,
             $this->getPharName()
         );
+
         return $downloadUrl;
     }
 }

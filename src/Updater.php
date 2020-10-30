@@ -1,9 +1,8 @@
 <?php
 /**
- * Humbug
+ * Humbug.
  *
  * @category   Humbug
- * @package    Humbug
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -12,15 +11,15 @@
 
 namespace Humbug\SelfUpdate;
 
-use Humbug\SelfUpdate\Exception\RuntimeException;
-use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\FilesystemException;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
+use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\NoSignatureException;
-use Humbug\SelfUpdate\Strategy\StrategyInterface;
-use Humbug\SelfUpdate\Strategy\ShaStrategy;
-use Humbug\SelfUpdate\Strategy\Sha256Strategy;
+use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
+use Humbug\SelfUpdate\Strategy\Sha256Strategy;
+use Humbug\SelfUpdate\Strategy\ShaStrategy;
+use Humbug\SelfUpdate\Strategy\StrategyInterface;
 
 class Updater
 {
@@ -91,7 +90,7 @@ class Updater
     protected $newVersionAvailable;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $localPharFile
      * @param bool $hasPubKey
@@ -101,7 +100,7 @@ class Updater
     {
         ini_set('phar.require_hash', 1);
         $this->setLocalPharFile($localPharFile);
-        if (!is_bool($hasPubKey)) {
+        if (! is_bool($hasPubKey)) {
             throw new InvalidArgumentException(
                 'Constructor parameter $hasPubKey must be boolean or null.'
             );
@@ -116,43 +115,46 @@ class Updater
     }
 
     /**
-     * Check for update
+     * Check for update.
      *
      * @return bool
      */
     public function hasUpdate()
     {
         $this->newVersionAvailable = $this->newVersionAvailable();
+
         return $this->newVersionAvailable;
     }
 
     /**
-     * Perform an update
+     * Perform an update.
      *
      * @return bool
      */
     public function update()
     {
         if ($this->newVersionAvailable === false
-        || (!is_bool($this->newVersionAvailable) && !$this->hasUpdate())) {
+        || (! is_bool($this->newVersionAvailable) && ! $this->hasUpdate())) {
             return false;
         }
         $this->backupPhar();
         $this->downloadPhar();
         $this->replacePhar();
+
         return true;
     }
 
     /**
-     * Perform an rollback to previous version
+     * Perform an rollback to previous version.
      *
      * @return bool
      */
     public function rollback()
     {
-        if (!$this->restorePhar()) {
+        if (! $this->restorePhar()) {
             return false;
         }
+
         return true;
     }
 
@@ -187,7 +189,7 @@ class Updater
     }
 
     /**
-     * Set backup extension for old phar versions
+     * Set backup extension for old phar versions.
      *
      * @param string $extension
      */
@@ -197,7 +199,7 @@ class Updater
     }
 
     /**
-     * Get backup extension for old phar versions
+     * Get backup extension for old phar versions.
      *
      * @return string
      */
@@ -229,8 +231,8 @@ class Updater
     public function getTempPharFile()
     {
         return $this->getTempDirectory()
-            . '/'
-            . sprintf('%s.phar.temp', $this->getLocalPharFileBasename());
+            .'/'
+            .sprintf('%s.phar.temp', $this->getLocalPharFileBasename());
     }
 
     public function getNewVersion()
@@ -244,20 +246,20 @@ class Updater
     }
 
     /**
-     * Set backup path for old phar versions
+     * Set backup path for old phar versions.
      *
      * @param string $filePath
      */
     public function setBackupPath($filePath)
     {
         $path = realpath(dirname($filePath));
-        if (!is_dir($path)) {
+        if (! is_dir($path)) {
             throw new FilesystemException(sprintf(
                 'The backup directory does not exist: %s.',
                 $path
             ));
         }
-        if (!is_writable($path)) {
+        if (! is_writable($path)) {
             throw new FilesystemException(sprintf(
                 'The backup directory is not writeable: %s.',
                 $path
@@ -267,7 +269,7 @@ class Updater
     }
 
     /**
-     * Get backup path for old phar versions
+     * Get backup path for old phar versions.
      *
      * @return string
      */
@@ -277,20 +279,20 @@ class Updater
     }
 
     /**
-     * Set path for the backup phar to rollback/restore from
+     * Set path for the backup phar to rollback/restore from.
      *
      * @param string $filePath
      */
     public function setRestorePath($filePath)
     {
         $path = realpath(dirname($filePath));
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             throw new FilesystemException(sprintf(
                 'The restore phar does not exist: %s.',
                 $path
             ));
         }
-        if (!is_readable($path)) {
+        if (! is_readable($path)) {
             throw new FilesystemException(sprintf(
                 'The restore file is not readable: %s.',
                 $path
@@ -300,7 +302,7 @@ class Updater
     }
 
     /**
-     * Get path for the backup phar to rollback/restore from
+     * Get path for the backup phar to rollback/restore from.
      *
      * @return string
      */
@@ -337,9 +339,10 @@ class Updater
         $this->newVersion = $this->strategy->getCurrentRemoteVersion($this);
         $this->oldVersion = $this->strategy->getCurrentLocalVersion($this);
 
-        if (!empty($this->newVersion) && ($this->newVersion !== $this->oldVersion)) {
+        if (! empty($this->newVersion) && ($this->newVersion !== $this->oldVersion)) {
             return true;
         }
+
         return false;
     }
 
@@ -360,7 +363,7 @@ class Updater
     {
         $this->strategy->download($this);
 
-        if (!file_exists($this->getTempPharFile())) {
+        if (! file_exists($this->getTempPharFile())) {
             throw new FilesystemException(
                 'Creation of download file failed.'
             );
@@ -380,7 +383,7 @@ class Updater
                 $this->cleanupAfterError();
                 throw new HttpRequestException(sprintf(
                     'Download file appears to be corrupted or outdated. The file '
-                        . 'received does not have the expected %s hash: %s.',
+                        .'received does not have the expected %s hash: %s.',
                     $algo,
                     $this->getNewVersion()
                 ));
@@ -404,13 +407,14 @@ class Updater
     protected function restorePhar()
     {
         $backup = $this->getRestorePharFile();
-        if (!file_exists($backup)) {
+        if (! file_exists($backup)) {
             throw new RuntimeException(sprintf(
                 'The backup file does not exist: %s.',
                 $backup
             ));
         }
         $this->validatePhar($backup);
+
         return rename($backup, $this->getLocalPharFile());
     }
 
@@ -419,9 +423,10 @@ class Updater
         if (null !== $this->getBackupPath()) {
             return $this->getBackupPath();
         }
+
         return $this->getTempDirectory()
-            . '/'
-            . sprintf('%s%s', $this->getLocalPharFileBasename(), $this->getBackupExtension());
+            .'/'
+            .sprintf('%s%s', $this->getLocalPharFileBasename(), $this->getBackupExtension());
     }
 
     protected function getRestorePharFile()
@@ -429,9 +434,10 @@ class Updater
         if (null !== $this->getRestorePath()) {
             return $this->getRestorePath();
         }
+
         return $this->getTempDirectory()
-            . '/'
-            . sprintf(
+            .'/'
+            .sprintf(
                 '%s%s',
                 $this->getLocalPharFileBasename(),
                 $this->getBackupExtension()
@@ -441,24 +447,24 @@ class Updater
     protected function getTempPubKeyFile()
     {
         return $this->getTempDirectory()
-            . '/'
-            . sprintf('%s.phar.temp.pubkey', $this->getLocalPharFileBasename());
+            .'/'
+            .sprintf('%s.phar.temp.pubkey', $this->getLocalPharFileBasename());
     }
 
     protected function setLocalPharFile($localPharFile)
     {
-        if (!is_null($localPharFile)) {
+        if (! is_null($localPharFile)) {
             $localPharFile = realpath($localPharFile);
         } else {
             $localPharFile = realpath($_SERVER['argv'][0]) ?: $_SERVER['argv'][0];
         }
-        if (!file_exists($localPharFile)) {
+        if (! file_exists($localPharFile)) {
             throw new RuntimeException(sprintf(
                 'The set phar file does not exist: %s.',
                 $localPharFile
             ));
         }
-        if (!is_writable($localPharFile)) {
+        if (! is_writable($localPharFile)) {
             throw new FilesystemException(sprintf(
                 'The current phar file is not writeable and cannot be replaced: %s.',
                 $localPharFile
@@ -470,8 +476,8 @@ class Updater
 
     protected function setLocalPubKeyFile()
     {
-        $localPubKeyFile = $this->getLocalPharFile() . '.pubkey';
-        if (!file_exists($localPubKeyFile)) {
+        $localPubKeyFile = $this->getLocalPharFile().'.pubkey';
+        if (! file_exists($localPubKeyFile)) {
             throw new RuntimeException(sprintf(
                 'The phar pubkey file does not exist: %s.',
                 $localPubKeyFile
@@ -483,7 +489,7 @@ class Updater
     protected function setTempDirectory()
     {
         $tempDirectory = dirname($this->getLocalPharFile());
-        if (!is_writable($tempDirectory)) {
+        if (! is_writable($tempDirectory)) {
             throw new FilesystemException(sprintf(
                 'The directory is not writeable: %s.',
                 $tempDirectory
@@ -496,11 +502,11 @@ class Updater
     {
         $phar = realpath($phar);
         if ($this->hasPubKey()) {
-            copy($this->getLocalPubKeyFile(), $phar . '.pubkey');
+            copy($this->getLocalPubKeyFile(), $phar.'.pubkey');
         }
         chmod($phar, fileperms($this->getLocalPharFile()));
         /** Switch invalid key errors to RuntimeExceptions */
-        set_error_handler(array($this, 'throwRuntimeException'));
+        set_error_handler([$this, 'throwRuntimeException']);
         $phar = new \Phar($phar);
         $signature = $phar->getSignature();
         if ($this->hasPubKey() && strtolower($signature['hash_type']) !== 'openssl') {
@@ -510,7 +516,7 @@ class Updater
         }
         restore_error_handler();
         if ($this->hasPubKey()) {
-            @unlink($phar . '.pubkey');
+            @unlink($phar.'.pubkey');
         }
         unset($phar);
     }
