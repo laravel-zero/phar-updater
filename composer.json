@@ -21,6 +21,12 @@
     "autoload": {
         "psr-4": { "Humbug\\SelfUpdate\\": "src/" }
     },
+    "scripts": {
+        "test:unit": "phpunit --colors=always",
+        "test": [
+            "@test:unit"
+        ]
+    },
     "conflict": {
         "padraic/phar-updater": "*"
     },
