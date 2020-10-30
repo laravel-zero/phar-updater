@@ -148,7 +148,7 @@ class UpdaterGithubStrategyTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ], JSON_THROW_ON_ERROR));
     }
 }
 
