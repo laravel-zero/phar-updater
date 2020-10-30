@@ -14,7 +14,7 @@ namespace Humbug\SelfUpdate;
 class VersionParser
 {
     /**
-     * @var array
+     * @var array<int, string>
      */
     private $versions;
 
@@ -24,7 +24,7 @@ class VersionParser
     private $modifier = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)(?:[.-]?(\d+))?)?([.-]?dev)?';
 
     /**
-     * @param array $versions
+     * @param array<mixed, string> $versions
      */
     public function __construct(array $versions = [])
     {
@@ -158,6 +158,7 @@ class VersionParser
         return $this->findMostRecent($candidates);
     }
 
+    /** @param array<mixed, string> $candidates */
     private function findMostRecent(array $candidates)
     {
         $candidate = null;
