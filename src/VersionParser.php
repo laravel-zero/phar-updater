@@ -14,7 +14,6 @@ namespace Humbug\SelfUpdate;
 
 class VersionParser
 {
-
     /**
      * @var array
      */
