@@ -13,10 +13,10 @@ namespace Humbug\Test\SelfUpdate;
 
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
+use PHPUnit\Framework\TestCase;
 
-class UpdaterTest extends \PHPUnit\Framework\TestCase
+class UpdaterTest extends TestCase
 {
-
     private $files;
 
     /** @var Updater */

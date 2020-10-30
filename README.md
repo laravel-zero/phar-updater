@@ -81,9 +81,10 @@ $updater->getStrategy()->setPharUrl('https://example.com/current.phar');
 $updater->getStrategy()->setVersionUrl('https://example.com/current.version');
 try {
     $result = $updater->update();
-    $result ? exit('Updated!') : exit('No update needed!');
+    echo $result ? "Updated!\n" : "No update needed!\n";
 } catch (\Exception $e) {
-    exit('Well, something happened! Either an oopsie or something involving hackers.');
+    echo "Well, something happened! Either an oopsie or something involving hackers.\n";
+    exit(1);
 }
 ```
 
@@ -102,9 +103,10 @@ $updater->getStrategy()->setPharUrl('https://example.com/current.phar');
 $updater->getStrategy()->setVersionUrl('https://example.com/current.version');
 try {
     $result = $updater->update();
-    $result ? exit('Updated!') : exit('No update needed!');
+    echo $result ? "Updated!\n" : "No update needed!\n";
 } catch (\Exception $e) {
-    exit('Well, something happened! Either an oopsie or something involving hackers.');
+    echo "Well, something happened! Either an oopsie or something involving hackers.\n";
+    exit(1);
 }
 ```
 
@@ -121,14 +123,15 @@ try {
     if ($result) {
         $new = $updater->getNewVersion();
         $old = $updater->getOldVersion();
-        exit(sprintf(
+        printf(
             'Updated from SHA-1 %s to SHA-1 %s', $old, $new
-        ));
+        );
     } else {
-        exit('No update needed!')
+        echo "No update needed!\n";
     }
 } catch (\Exception $e) {
-    exit('Well, something happened! Either an oopsie or something involving hackers.');
+    echo "Well, something happened! Either an oopsie or something involving hackers.\n";
+    exit(1);
 }
 ```
 
@@ -138,7 +141,7 @@ phars which are released to a specific numbered version.
 
 ### Github Release Strategy
 
-Beyond development or nightly phars, if you are released numbered versions on
+Beyond development or nightly phars, if you are releasing numbered versions on
 Github (i.e. tags), you can upload additional files (such as phars) to include in
 the Github Release.
 
@@ -157,9 +160,10 @@ $updater->getStrategy()->setPharName('myapp.phar');
 $updater->getStrategy()->setCurrentLocalVersion('v1.0.1');
 try {
     $result = $updater->update();
-    $result ? exit('Updated!') : exit('No update needed!');
+    echo $result ? "Updated!\n" : "No update needed!\n";
 } catch (\Exception $e) {
-    exit('Well, something happened! Either an oopsie or something involving hackers.');
+    echo "Well, something happened! Either an oopsie or something involving hackers.\n";
+    exit(1);
 }
 ```
 
@@ -201,9 +205,14 @@ use Humbug\SelfUpdate\Updater;
 $updater = new Updater();
 try {
     $result = $updater->rollback();
-    $result ? exit('Success!') : exit('Failure!');
+    if (!$result) {
+        echo "Failure!\n";
+        exit(1);
+    }
+    echo "Success!\n";
 } catch (\Exception $e) {
-    exit('Well, something happened! Either an oopsie or something involving hackers.');
+    echo "Well, something happened! Either an oopsie or something involving hackers.\n";
+    exit(1);
 }
 ```
 
@@ -262,8 +271,11 @@ use Humbug\SelfUpdate\Updater;
  * Configuration is identical in every way for actual updates. You can run this
  * across multiple configuration variants to get recent stable, unstable, and dev
  * versions available.
+ *
+ * This would configure update for an unsigned phar (second constructor must be
+ * false in this case).
  */
-$updater = new Updater();
+$updater = new Updater(null, false);
 $updater->setStrategy(Updater::STRATEGY_GITHUB);
 $updater->getStrategy()->setPackageName('myvendor/myapp');
 $updater->getStrategy()->setPharName('myapp.phar');
@@ -272,17 +284,18 @@ $updater->getStrategy()->setCurrentLocalVersion('v1.0.1');
 try {
     $result = $updater->hasUpdate();
     if ($result) {
-        echo(sprintf(
+        printf(
             'The current stable build available remotely is: %s',
             $updater->getNewVersion()
-        ));
+        );
     } elseif (false === $updater->getNewVersion()) {
-        echo('There are no stable builds available.');
+        echo "There are no stable builds available.\n";
     } else {
-        echo('You have the current stable build installed.');
+        echo "You have the current stable build installed.\n";
     }
 } catch (\Exception $e) {
-    exit('Well, something happened! Either an oopsie or something involving hackers.');
+    echo "Well, something happened! Either an oopsie or something involving hackers.\n";
+    exit(1);
 }
 ```
 
@@ -302,7 +315,7 @@ likely needed prior to updating, or disable their loading if not essential.
 ### Custom Update Strategies
 
 All update strategies revolve around checking for updates, and downloading updates.
-The actual work behind replacing local files and backups is handled separate.
+The actual work behind replacing local files and backups is handled separately.
 To create a custom strategy, you can implement `Humbug\SelfUpdate\Strategy\StrategyInterface`
 and pass a new instance of your implementation post-construction.
 
