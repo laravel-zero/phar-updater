@@ -4,7 +4,7 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 [![Build Status](https://img.shields.io/github/workflow/status/laravel-zero/phar-updater/Tests.svg?style=flat-square)](https://github.com/laravel-zero/phar-updater/actions)
 [![StyleCI](https://styleci.io/repos/308408356/shield?style=flat-square)](https://styleci.io/repos/308408356)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel-zero/phar-updater.png?style=flat-square)](https://packagist.org/packages/laravel-zero/phar-updater)
+[![Total Downloads](https://img.shields.io/packagist/dt/laravel-zero/phar-updater.svg?style=flat-square)](https://packagist.org/packages/laravel-zero/phar-updater)
 
 > This is a fork of the [Humbug PHAR Updater](https://github.com/humbug/phar-updater) for internal use in Laravel Zero.
 
