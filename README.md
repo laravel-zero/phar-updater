@@ -323,7 +323,8 @@ The similar `setStrategy()` method is solely used to pass flags matching interna
 ### SHA-1 / SHA-256 Hash Synchronisation
 
 The phar-updater package only (that will change!) supports an update strategy where phars are updated according to the
-SHA-1 hash of the current phar file available remotely. This assumes the existence of only two to three remote files:
+SHA-1 or SHA-256 hash of the current PHAR file available remotely. This assumes the existence of only two to three
+remote files:
 
 * myname.phar
 * myname.version
