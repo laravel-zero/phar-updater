@@ -16,7 +16,7 @@ that? Here at Humbug Central, our army of minions (all ten of them) have written
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
-    - [Basic SHA-1 Strategy](#basic-sha-1-strategy)
+    - [Basic SHA-1 / SHA-256 Strategy](#basic-sha-1--sha-256-strategy)
     - [Github Release Strategy](#github-release-strategy)
     - [Rollback Support](#rollback-support)
     - [Constructor Parameters](#constructor-parameters)
@@ -24,7 +24,7 @@ that? Here at Humbug Central, our army of minions (all ten of them) have written
     - [Avoid Post Update File Includes](#avoid-post-update-file-includes)
     - [Custom Update Strategies](#custom-update-strategies)
 - [Update Strategies](#update-strategies)
-    - [SHA-1 Hash Synchronisation](#sha-1-hash-synchronisation)
+    - [SHA-1 / SHA-256 Hash Synchronisation](#sha-1--sha-256-hash-synchronisation)
     - [Github Releases](#github-releases)
 
 ## Introduction
@@ -34,7 +34,7 @@ The `laravel-zero/phar-updater` package has the following features:
 * Full support for SSL/TLS verification.
 * Support for OpenSSL phar signatures.
 * Simple API where it either updates or Exceptions will go wild.
-* Support for SHA-1 version synchronisation and Github Releases as update strategies.
+* Support for SHA-1/SHA-256 version synchronisation and Github Releases as update strategies.
 
 Apart from the detailed documentation below, you can find the package being used within
 [Laravel Zero's self-update component](https://github.com/laravel-zero/framework/blob/master/src/Components/Updater).
@@ -45,7 +45,7 @@ Apart from the detailed documentation below, you can find the package being used
 composer require laravel-zero/phar-updater
 ```
 
-The package utilises PHP Streams for remote requests so it will require the openssl extension and the `allow_url_open`
+The package utilises PHP Streams for remote requests, so it will require the openssl extension and the `allow_url_open`
 setting to both be enabled. Support for curl will follow in time.
 
 ## Usage
@@ -54,7 +54,9 @@ The default update strategy uses an SHA-1 hash of the current remote phar in a v
 phar when this version is changed. There is also a Github strategy which tracks Github Releases where you can upload a
 new phar file for a release.
 
-### Basic SHA-1 Strategy
+### Basic SHA-1 / SHA-256 Strategy
+
+> NOTE: The SHA-1 strategy is marked as deprecated, you should prefer the SHA-256 strategy instead.
 
 Create your self-update command, or even an update command for some other phar other than the current one, and include
 this.
@@ -71,6 +73,10 @@ this.
 use Humbug\SelfUpdate\Updater;
 
 $updater = new Updater();
+
+// Add the below to use the SHA-256 strategy. It will default to SHA-1 if excluded.
+$updater->setStrategy(Updater::STRATEGY_SHA256);
+
 $updater->getStrategy()->setPharUrl('https://example.com/current.phar');
 $updater->getStrategy()->setVersionUrl('https://example.com/current.version');
 try {
@@ -129,8 +135,9 @@ try {
 }
 ```
 
-See the Update Strategies section for an overview of how to setup the SHA-1 strategy. It's a simple to maintain choice
-for development or nightly versions of phars which are released to a specific numbered version.
+See the [Update Strategies](#update-strategies) section for an overview of how to set up the SHA-1 or SHA-256 strategy.
+It's a simple to maintain choice for development or nightly versions of phars which are released to a specific numbered
+version.
 
 ### Github Release Strategy
 
@@ -313,7 +320,7 @@ The similar `setStrategy()` method is solely used to pass flags matching interna
 
 ## Update Strategies
 
-### SHA-1 Hash Synchronisation
+### SHA-1 / SHA-256 Hash Synchronisation
 
 The phar-updater package only (that will change!) supports an update strategy where phars are updated according to the
 SHA-1 hash of the current phar file available remotely. This assumes the existence of only two to three remote files:
@@ -324,15 +331,20 @@ SHA-1 hash of the current phar file available remotely. This assumes the existen
 
 The `myname.phar` is the most recently built phar.
 
-The `myname.version` contains the SHA-1 hash of the most recently built phar where the hash is the very first string (if
-not the only string). You can generate this quite easily from bash using:
+The `myname.version` contains the SHA-1 or SHA-256 hash of the most recently built phar where the hash is the very first
+string (if not the only string). You can generate this quite easily from bash using:
 
 ```bash
+# For SHA-1
 sha1sum myname.phar > myname.version
+
+# For SHA-256
+sha256sum myname.phar > myname.version
 ```
 
-Remember to regenerate the version file for each new phar build you want to distribute. Using `sha1sum` adds additional
-data after the hash, but it's fine since the hash is the first string in the file which is the only requirement.
+Remember to regenerate the version file for each new phar build you want to distribute. Using `sha1sum`/`sha256sum` adds
+additional data after the hash, but it's fine since the hash is the first string in the file which is the only
+requirement.
 
 If using OpenSSL signing, which is very much recommended, you can also put the public key online as `myname.phar.pubkey`
 , for the initial installation of your phar. However, please note that phar-updater itself will never download this key,
@@ -341,7 +353,7 @@ locally cached public key.
 
 If you need to switch keys for any reason whatsoever, users will need to manually download a new phar along with the new
 key. While that sounds extreme, it's generally not a good idea to allow for arbitrary key changes that occur without
-user knowledge. The openssl signing has no mechanism such as a central authority or a browser's trusted certificate
+user knowledge. The openssl signing has no mechanism such as a central authority, or a browser's trusted certificate
 stash with which to automate such key changes in a safe manner.
 
 ### Github Releases
@@ -358,7 +370,7 @@ without versioning information in the file name. You can also upload your phar's
 established convention of being the phar name with `.pubkey` appended, e.g.
 `myapp.phar` would be matched with `myapp.phar.pubkey`.
 
-You can read more about Github releases [here](https://help.github.com/articles/creating-releases/).
+You can read more about Github releases [here](https://help.github.com/articles/creating-releases).
 
 While you can draft a release, Github releases are created automatically whenever you create a new git tag. If you use
 git tagging, you can go to the matching release on Github, click the `Edit` button and attach files. It's recommended to
