@@ -41,8 +41,16 @@ Apart from the detailed documentation below, you can find the package being used
 
 ## Installation
 
-```
+Via Composer
+
+```bash
 composer require laravel-zero/phar-updater
+```
+
+Via the Laravel Zero component installer
+
+```bash
+php <application> app:install self-update
 ```
 
 The package utilises PHP Streams for remote requests, so it will require the openssl extension and the `allow_url_open`
