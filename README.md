@@ -8,8 +8,7 @@
 
 > This is a fork of the [Humbug PHAR Updater](https://github.com/humbug/phar-updater) for internal use in Laravel Zero.
 
-You have a phar file to distribute, and it's all the rage to include a self-update command. Do you really need to write
-that? Here at Humbug Central, our army of minions (all ten of them) have written one for you.
+The backend for the self-update command in Laravel Zero PHARs. Originally created by Humbug.
 
 **Table of Contents**
 
