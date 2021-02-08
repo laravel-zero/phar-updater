@@ -20,6 +20,7 @@ use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Strategy\Sha256Strategy;
 use Humbug\SelfUpdate\Strategy\Sha512Strategy;
 use Humbug\SelfUpdate\Strategy\ShaStrategy;
+use Humbug\SelfUpdate\Strategy\ShaStrategyAbstract;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
 
 class Updater
@@ -376,16 +377,20 @@ class Updater
             );
         }
 
-        if ($this->getStrategy() instanceof ShaStrategy
-            || $this->getStrategy() instanceof Sha256Strategy
-        ) {
-            if ($this->getStrategy() instanceof ShaStrategy) {
+        $strategy = $this->getStrategy();
+
+        if ($strategy instanceof ShaStrategyAbstract) {
+            if ($strategy instanceof ShaStrategy) {
                 $tmpVersion = sha1_file($this->getTempPharFile());
                 $algo = 'SHA-1';
+            } elseif ($strategy instanceof Sha512Strategy) {
+                $tmpVersion = hash_file('sha512', $this->getTempPharFile());
+                $algo = 'SHA-512';
             } else {
                 $tmpVersion = hash_file('sha256', $this->getTempPharFile());
                 $algo = 'SHA-256';
             }
+
             if ($tmpVersion !== $this->getNewVersion()) {
                 $this->cleanupAfterError();
                 throw new HttpRequestException(sprintf(
