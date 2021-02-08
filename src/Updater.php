@@ -18,6 +18,7 @@ use Humbug\SelfUpdate\Exception\NoSignatureException;
 use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Strategy\Sha256Strategy;
+use Humbug\SelfUpdate\Strategy\Sha512Strategy;
 use Humbug\SelfUpdate\Strategy\ShaStrategy;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
 
@@ -26,6 +27,8 @@ class Updater
     const STRATEGY_SHA1 = 'sha1';
 
     const STRATEGY_SHA256 = 'sha256';
+
+    const STRATEGY_SHA512 = 'sha512';
 
     const STRATEGY_GITHUB = 'github';
 
@@ -170,6 +173,10 @@ class Updater
 
             case self::STRATEGY_SHA256:
                 $this->strategy = new Sha256Strategy;
+                break;
+
+            case self::STRATEGY_SHA512:
+                $this->strategy = new Sha512Strategy;
                 break;
 
             default:
