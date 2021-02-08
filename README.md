@@ -15,7 +15,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
-    - [Basic SHA-1 / SHA-256 Strategy](#basic-sha-1--sha-256-strategy)
+    - [Basic SHA-1 / SHA-256 / SHA-512 Strategy](#basic-sha-1--sha-256--sha-512-strategy)
     - [Github Release Strategy](#github-release-strategy)
     - [Rollback Support](#rollback-support)
     - [Constructor Parameters](#constructor-parameters)
@@ -23,7 +23,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
     - [Avoid Post Update File Includes](#avoid-post-update-file-includes)
     - [Custom Update Strategies](#custom-update-strategies)
 - [Update Strategies](#update-strategies)
-    - [SHA-1 / SHA-256 Hash Synchronisation](#sha-1--sha-256-hash-synchronisation)
+    - [SHA-1 / SHA-256 / SHA-512 Hash Synchronisation](#sha-1--sha-256--sha-512-hash-synchronisation)
     - [Github Releases](#github-releases)
 
 ## Introduction
@@ -33,7 +33,7 @@ The `laravel-zero/phar-updater` package has the following features:
 * Full support for SSL/TLS verification.
 * Support for OpenSSL phar signatures.
 * Simple API where it either updates or Exceptions will go wild.
-* Support for SHA-1/SHA-256 version synchronisation and Github Releases as update strategies.
+* Support for SHA-1/SHA-256/SHA-512 version synchronisation and Github Releases as update strategies.
 
 Apart from the detailed documentation below, you can find the package being used within
 [Laravel Zero's self-update component](https://github.com/laravel-zero/framework/blob/master/src/Components/Updater).
@@ -61,9 +61,9 @@ The default update strategy uses an SHA-1 hash of the current remote phar in a v
 phar when this version is changed. There is also a Github strategy which tracks Github Releases where you can upload a
 new phar file for a release.
 
-### Basic SHA-1 / SHA-256 Strategy
+### Basic SHA-1 / SHA-256 / SHA-512 Strategy
 
-> NOTE: The SHA-1 strategy is marked as deprecated, you should prefer the SHA-256 strategy instead.
+> NOTE: The SHA-1 strategy is marked as deprecated, you should prefer the SHA-256 or SHA-512 strategies instead.
 
 Create your self-update command, or even an update command for some other phar other than the current one, and include
 this.
@@ -327,11 +327,10 @@ The similar `setStrategy()` method is solely used to pass flags matching interna
 
 ## Update Strategies
 
-### SHA-1 / SHA-256 Hash Synchronisation
+### SHA-1 / SHA-256 / SHA-512 Hash Synchronisation
 
-The phar-updater package only (that will change!) supports an update strategy where phars are updated according to the
-SHA-1 or SHA-256 hash of the current PHAR file available remotely. This assumes the existence of only two to three
-remote files:
+The phar-updater package supports an update strategy where phars are updated according to the SHA-1, SHA-256, or SHA-512
+hash of the current PHAR file available remotely. This assumes the existence of only two to three remote files:
 
 * myname.phar
 * myname.version
@@ -339,7 +338,7 @@ remote files:
 
 The `myname.phar` is the most recently built phar.
 
-The `myname.version` contains the SHA-1 or SHA-256 hash of the most recently built phar where the hash is the very first
+The `myname.version` contains the SHA-1, SHA-256, or SHA-512 hash of the most recently built phar where the hash is the very first
 string (if not the only string). You can generate this quite easily from bash using:
 
 ```bash
@@ -348,10 +347,13 @@ sha1sum myname.phar > myname.version
 
 # For SHA-256
 sha256sum myname.phar > myname.version
+
+# For SHA-512
+sha512sum myname.phar > myname.version
 ```
 
-Remember to regenerate the version file for each new phar build you want to distribute. Using `sha1sum`/`sha256sum` adds
-additional data after the hash, but it's fine since the hash is the first string in the file which is the only
+Remember to regenerate the version file for each new phar build you want to distribute. Using `sha1sum`/`sha256sum`/`sha512sum`
+adds additional data after the hash, but it's fine since the hash is the first string in the file which is the only
 requirement.
 
 If using OpenSSL signing, which is very much recommended, you can also put the public key online as `myname.phar.pubkey`
