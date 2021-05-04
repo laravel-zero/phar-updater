@@ -16,7 +16,7 @@
     },
     "require-dev": {
         "ext-json": "*",
-        "phpstan/phpstan": "^0.12.81",
+        "phpstan/phpstan": "^0.12.85",
         "phpunit/phpunit": "^9.4"
     },
     "autoload": {
