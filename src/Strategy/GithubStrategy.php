@@ -20,7 +20,7 @@ use Humbug\SelfUpdate\VersionParser;
 
 class GithubStrategy implements StrategyInterface
 {
-    const API_URL = 'https://packagist.org/p/%s.json';
+    const API_URL = 'https://packagist.org/p2/%s.json';
 
     const STABLE = 'stable';
 
