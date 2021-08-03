@@ -139,12 +139,14 @@ class UpdaterGithubStrategyTest extends TestCase
         file_put_contents($this->tmp.'/packages.json', json_encode([
             'packages' => [
                 'humbug/test-phar' => [
-                    '1.0.1' => [
+                    [
+                        'version' => '1.0.1',
                         'source' => [
                             'url' => 'file://'.$this->tmp.'.git',
                         ],
                     ],
-                    '1.0.0' => [
+                    [
+                        'version' => '1.0.0',
                     ],
                 ],
             ],

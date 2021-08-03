@@ -101,7 +101,7 @@ class GithubStrategy implements StrategyInterface
             );
         }
 
-        $versions = array_keys($package['packages'][$this->getPackageName()]);
+        $versions = array_column($package['packages'][$this->getPackageName()], 'version');
         $versionParser = new VersionParser($versions);
         if ($this->getStability() === self::STABLE) {
             $this->remoteVersion = $versionParser->getMostRecentStable();
@@ -115,7 +115,11 @@ class GithubStrategy implements StrategyInterface
          * Setup remote URL if there's an actual version to download.
          */
         if (! empty($this->remoteVersion)) {
-            $this->remoteUrl = $this->getDownloadUrl($package);
+            $chosenVersion = array_filter($package['packages'][$this->getPackageName()], function (array $package) {
+                return $package['version'] === $this->remoteVersion;
+            })[0];
+
+            $this->remoteUrl = $this->getDownloadUrl($chosenVersion);
         }
 
         return $this->remoteVersion;
@@ -218,15 +222,14 @@ class GithubStrategy implements StrategyInterface
         $baseUrl = preg_replace(
             '{\.git$}',
             '',
-            $package['packages'][$this->getPackageName()][$this->remoteVersion]['source']['url']
+            $package['source']['url']
         );
-        $downloadUrl = sprintf(
+
+        return sprintf(
             '%s/releases/download/%s/%s',
             $baseUrl,
             $this->remoteVersion,
             $this->getPharName()
         );
-
-        return $downloadUrl;
     }
 }
