@@ -9,6 +9,11 @@
             "name": "Padraic Brady",
             "email": "padraic.brady@gmail.com",
             "homepage": "http://blog.astrumfutura.com"
+        },
+        {
+            "name": "Owen Voke",
+            "email": "development@voke.dev",
+            "homepage": "https://voke.dev"
         }
     ],
     "require": {
