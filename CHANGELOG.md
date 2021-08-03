@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), and this 
 
 ## Unreleased
 
+## [v1.1.1 - 2021-08-03](https://github.com/laravel-zero/phar-updater/compare/v1.1.0...v1.1.1)
+
+### Fixed
+- Apply packagist changes to GithubStrategy ([#5](https://github.com/laravel-zero/phar-updater/pull/5))
+
 ## [v1.1.0 - 2021-06-29](https://github.com/laravel-zero/phar-updater/compare/v1.0.6...v1.1.0)
 
 ### Added
