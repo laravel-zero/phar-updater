@@ -16,14 +16,14 @@
     },
     "require-dev": {
         "ext-json": "*",
-        "phpstan/phpstan": "^0.12.85",
+        "phpstan/phpstan": "^0.12.94",
         "phpunit/phpunit": "^9.4"
     },
     "autoload": {
         "psr-4": { "Humbug\\SelfUpdate\\": "src/" }
     },
     "scripts": {
-        "test:types": "phpstan analyse --ansi --memory-limit=0",
+        "test:types": "phpstan analyse --ansi --memory-limit=-1",
         "test:unit": "phpunit --colors=always",
         "test": [
             "@test:types",
