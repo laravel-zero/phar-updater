@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), and this 
 
 ## Unreleased
 
+## [v1.2.0 - 2022-02-04](https://github.com/laravel-zero/phar-updater/compare/v1.1.1...v1.2.0)
+
+### Added
+- Add support for PHP 8.1 ([#7](https://github.com/laravel-zero/phar-updater/pull/7))
+
+### Removed
+- Drop support for PHP `<8.0` ([#7](https://github.com/laravel-zero/phar-updater/pull/7))
+
 ## [v1.1.1 - 2021-08-03](https://github.com/laravel-zero/phar-updater/compare/v1.1.0...v1.1.1)
 
 ### Fixed
