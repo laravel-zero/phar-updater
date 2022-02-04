@@ -390,8 +390,8 @@ attached.
 
 ### Direct Downloads
 
-PHAR Updater provides an abstract `Humbug\SelfUpdate\Strategy\DirectDownloadStrategyAbstract` class which can be used to
-quickly and easily create download strategies with just a `getDownloadUrl(): string` method.
+PHAR Updater provides an abstract [`Humbug\SelfUpdate\Strategy\DirectDownloadStrategyAbstract` class](src/Strategy/DirectDownloadStrategyAbstract.php)
+which can be used to quickly and easily create download strategies with just a `getDownloadUrl(): string` method.
 
 For example, if a PHAR downloads it's latest updates from `https://example.com/latest/example.phar`, you can utilise this
 with the following code:
