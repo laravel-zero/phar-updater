@@ -21,8 +21,8 @@
     },
     "require-dev": {
         "ext-json": "*",
-        "phpstan/phpstan": "^0.12.94",
-        "phpunit/phpunit": "^9.4"
+        "phpstan/phpstan": "^1.4.5",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": { "Humbug\\SelfUpdate\\": "src/" }
