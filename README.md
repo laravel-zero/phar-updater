@@ -25,6 +25,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
 - [Update Strategies](#update-strategies)
     - [SHA-1 / SHA-256 / SHA-512 Hash Synchronisation](#sha-1--sha-256--sha-512-hash-synchronisation)
     - [Github Releases](#github-releases)
+    - [Direct Downloads](#direct-downloads)
 
 ## Introduction
 
@@ -386,3 +387,48 @@ While you can draft a release, Github releases are created automatically wheneve
 git tagging, you can go to the matching release on Github, click the `Edit` button and attach files. It's recommended to
 do this as soon as possible after tagging to limit the window whereby a new release exists without an updated phar
 attached.
+
+### Direct Downloads
+
+PHAR Updater provides an abstract `Humbug\SelfUpdate\Strategy\DirectDownloadStrategyAbstract` class which can be used to
+quickly and easily create download strategies with just a `getDownloadUrl(): string` method.
+
+For example, if a PHAR downloads it's latest updates from `https://example.com/latest/example.phar`, you can utilise this
+with the following code:
+
+```php
+use Humbug\SelfUpdate\Strategy\DirectDownloadStrategyAbstract;
+
+class ExampleDirectDownloadStrategy extends DirectDownloadStrategyAbstract
+{
+    public function getDownloadUrl(): string
+    {
+        return 'https://example.com/latest/example.phar';
+    }
+}
+```
+
+The abstract strategy also supports overriding the `getCurrentRemoteVersion()` method, so that you could add a custom
+HTTP call or other method for seeing what the latest version is. By default, it returns the string `latest`.
+
+```php
+use Illuminate\Support\Facades\Http;
+use Humbug\SelfUpdate\Strategy\DirectDownloadStrategyAbstract;
+
+class ExampleDirectDownloadStrategy extends DirectDownloadStrategyAbstract
+{
+    /** {@inheritdoc} */
+    public function getCurrentRemoteVersion(Updater $updater)
+    {
+        return Http::get('https://example.com/example-releases.json')->json()['latest-version'];
+    }
+
+    public function getDownloadUrl(): string
+    {
+        return 'https://example.com/{$this->getCurrentRemoteVersion()}/example.phar';
+    }
+}
+```
+
+You can also set and retrieve the current local version using the `setCurrentLocalVersion()` and `getCurrentLocalVersion()`
+methods, which will be used for comparison with the remote version.
