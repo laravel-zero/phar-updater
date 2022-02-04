@@ -425,7 +425,7 @@ class ExampleDirectDownloadStrategy extends DirectDownloadStrategyAbstract
 
     public function getDownloadUrl(): string
     {
-        return 'https://example.com/{$this->getCurrentRemoteVersion()}/example.phar';
+        return "https://example.com/{$this->getCurrentRemoteVersion()}/example.phar";
     }
 }
 ```
