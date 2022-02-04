@@ -420,7 +420,7 @@ class ExampleDirectDownloadStrategy extends DirectDownloadStrategyAbstract
     /** {@inheritdoc} */
     public function getCurrentRemoteVersion(Updater $updater)
     {
-        return Http::get('https://example.com/example-releases.json')->json()['latest-version'];
+        return Http::get('https://example.com/example-releases.json')->object()->latest_version;
     }
 
     public function getDownloadUrl(): string
