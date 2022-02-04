@@ -3,6 +3,7 @@
  * Humbug.
  *
  * @category   Humbug
+ *
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -24,7 +25,7 @@ class VersionParser
     private $modifier = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)(?:[.-]?(\d+))?)?([.-]?dev)?';
 
     /**
-     * @param array<mixed, string> $versions
+     * @param  array<mixed, string>  $versions
      */
     public function __construct(array $versions = [])
     {
@@ -67,7 +68,7 @@ class VersionParser
     /**
      * Checks if given version string represents a stable numbered version.
      *
-     * @param string $version
+     * @param  string  $version
      * @return bool
      */
     public function isStable($version)
@@ -79,7 +80,7 @@ class VersionParser
      * Checks if given version string represents a 'pre-release' version, i.e.
      * it's unstable but not development level.
      *
-     * @param string $version
+     * @param  string  $version
      * @return bool
      */
     public function isPreRelease($version)
@@ -91,7 +92,7 @@ class VersionParser
      * Checks if given version string represents an unstable or dev-level
      * numbered version.
      *
-     * @param string $version
+     * @param  string  $version
      * @return bool
      */
     public function isUnstable($version)
@@ -102,7 +103,7 @@ class VersionParser
     /**
      * Checks if given version string represents a dev-level numbered version.
      *
-     * @param string $version
+     * @param  string  $version
      * @return bool
      */
     public function isDevelopment($version)

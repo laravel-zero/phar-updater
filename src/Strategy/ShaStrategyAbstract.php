@@ -3,6 +3,7 @@
  * Humbug.
  *
  * @category   Humbug
+ *
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -38,7 +39,7 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     /**
      * Download the remote Phar file.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return void
      */
     public function download(Updater $updater)
@@ -60,7 +61,7 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     /**
      * Set URL to phar file.
      *
-     * @param string $url
+     * @param  string  $url
      */
     public function setPharUrl($url)
     {
@@ -85,7 +86,7 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     /**
      * Set URL to version file.
      *
-     * @param string $url
+     * @param  string  $url
      */
     public function setVersionUrl($url)
     {

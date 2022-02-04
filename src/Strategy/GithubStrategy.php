@@ -3,6 +3,7 @@
  * Humbug.
  *
  * @category   Humbug
+ *
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -61,7 +62,7 @@ class GithubStrategy implements StrategyInterface
     /**
      * Download the remote Phar file.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return void
      */
     public function download(Updater $updater)
@@ -83,7 +84,7 @@ class GithubStrategy implements StrategyInterface
     /**
      * Retrieve the current version available remotely.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater)
@@ -128,7 +129,7 @@ class GithubStrategy implements StrategyInterface
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater)
@@ -139,7 +140,7 @@ class GithubStrategy implements StrategyInterface
     /**
      * Set version string of the local phar.
      *
-     * @param string $version
+     * @param  string  $version
      */
     public function setCurrentLocalVersion($version)
     {
@@ -149,7 +150,7 @@ class GithubStrategy implements StrategyInterface
     /**
      * Set Package name.
      *
-     * @param string $name
+     * @param  string  $name
      */
     public function setPackageName($name)
     {
@@ -169,7 +170,7 @@ class GithubStrategy implements StrategyInterface
     /**
      * Set phar file's name.
      *
-     * @param string $name
+     * @param  string  $name
      */
     public function setPharName($name)
     {
@@ -189,7 +190,7 @@ class GithubStrategy implements StrategyInterface
     /**
      * Set target stability.
      *
-     * @param string $stability
+     * @param  string  $stability
      */
     public function setStability($stability)
     {

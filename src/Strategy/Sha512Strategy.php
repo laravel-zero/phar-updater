@@ -11,7 +11,7 @@ final class Sha512Strategy extends ShaStrategyAbstract
     /**
      * Retrieve the current version available remotely.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater)
@@ -43,7 +43,7 @@ final class Sha512Strategy extends ShaStrategyAbstract
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater)

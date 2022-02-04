@@ -3,6 +3,7 @@
  * Humbug.
  *
  * @category   Humbug
+ *
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -96,9 +97,9 @@ class Updater
     /**
      * Constructor.
      *
-     * @param string $localPharFile
-     * @param bool $hasPubKey
-     * @param string $strategy
+     * @param  string  $localPharFile
+     * @param  bool  $hasPubKey
+     * @param  string  $strategy
      */
     public function __construct($localPharFile = null, $hasPubKey = true, $strategy = self::STRATEGY_SHA1)
     {
@@ -163,7 +164,7 @@ class Updater
     }
 
     /**
-     * @param string $strategy
+     * @param  string  $strategy
      */
     public function setStrategy($strategy)
     {
@@ -199,7 +200,7 @@ class Updater
     /**
      * Set backup extension for old phar versions.
      *
-     * @param string $extension
+     * @param  string  $extension
      */
     public function setBackupExtension($extension)
     {
@@ -256,7 +257,7 @@ class Updater
     /**
      * Set backup path for old phar versions.
      *
-     * @param string $filePath
+     * @param  string  $filePath
      */
     public function setBackupPath($filePath)
     {
@@ -289,7 +290,7 @@ class Updater
     /**
      * Set path for the backup phar to rollback/restore from.
      *
-     * @param string $filePath
+     * @param  string  $filePath
      */
     public function setRestorePath($filePath)
     {

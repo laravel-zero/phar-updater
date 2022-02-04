@@ -3,6 +3,7 @@
  * Humbug.
  *
  * @category   Humbug
+ *
  * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -18,7 +19,7 @@ interface StrategyInterface
     /**
      * Download the remote Phar file.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return void
      */
     public function download(Updater $updater);
@@ -26,7 +27,7 @@ interface StrategyInterface
     /**
      * Retrieve the current version available remotely.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater);
@@ -34,7 +35,7 @@ interface StrategyInterface
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater);

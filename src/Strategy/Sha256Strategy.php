@@ -3,6 +3,7 @@
  * Humbug.
  *
  * @category   Humbug
+ *
  * @copyright  Copyright (c) 2017 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    https://github.com/padraic/phar-updater/blob/master/LICENSE New BSD License
  *
@@ -20,7 +21,7 @@ final class Sha256Strategy extends ShaStrategyAbstract
     /**
      * Retrieve the current version available remotely.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater)
@@ -52,7 +53,7 @@ final class Sha256Strategy extends ShaStrategyAbstract
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param Updater $updater
+     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater)
