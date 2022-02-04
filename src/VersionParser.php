@@ -162,8 +162,7 @@ class VersionParser
     /** @param array<mixed, string> $candidates */
     private function findMostRecent(array $candidates)
     {
-        $candidate = null;
-        $tracker = null;
+        $candidate = '';
         foreach ($candidates as $version) {
             if (version_compare($candidate, $version, '<')) {
                 $candidate = $version;
