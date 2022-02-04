@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), and this 
 
 ## Unreleased
 
+## [v1.3.0 - 2022-02-04](https://github.com/laravel-zero/phar-updater/compare/v1.2.0...v1.3.0)
+
+### Added
+- Add a new abstract Direct Download class ([#8](https://github.com/laravel-zero/phar-updater/pull/8))
+
 ## [v1.2.0 - 2022-02-04](https://github.com/laravel-zero/phar-updater/compare/v1.1.1...v1.2.0)
 
 ### Added
