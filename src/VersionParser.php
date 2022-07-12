@@ -159,7 +159,7 @@ class VersionParser
         return $this->findMostRecent($candidates);
     }
 
-    /** @param array<mixed, string> $candidates */
+    /** @param  array<mixed, string>  $candidates */
     private function findMostRecent(array $candidates)
     {
         $candidate = '';

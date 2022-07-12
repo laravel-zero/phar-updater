@@ -217,7 +217,7 @@ class GithubStrategy implements StrategyInterface
         return sprintf(self::API_URL, $this->getPackageName());
     }
 
-    /** @param array<mixed, mixed> $package */
+    /** @param  array<mixed, mixed>  $package */
     protected function getDownloadUrl(array $package)
     {
         $baseUrl = preg_replace(
