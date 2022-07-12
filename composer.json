@@ -21,6 +21,7 @@
     },
     "require-dev": {
         "ext-json": "*",
+        "laravel/pint": "^0.2.3",
         "phpstan/phpstan": "^1.4.5",
         "phpunit/phpunit": "^9.5"
     },
