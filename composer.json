@@ -21,8 +21,8 @@
     },
     "require-dev": {
         "ext-json": "*",
-        "laravel/pint": "^1.0",
-        "phpstan/phpstan": "^1.4.5",
+        "laravel/pint": "^1.4",
+        "phpstan/phpstan": "^1.9.8",
         "phpunit/phpunit": "^9.5"
     },
     "autoload": {
