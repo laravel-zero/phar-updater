@@ -2,8 +2,8 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/laravel-zero/phar-updater.svg?style=flat-square)](https://packagist.org/packages/laravel-zero/phar-updater)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![Build Status](https://img.shields.io/github/workflow/status/laravel-zero/phar-updater/Tests.svg?style=flat-square)](https://github.com/laravel-zero/phar-updater/actions)
-[![Static Analysis](https://img.shields.io/github/workflow/status/laravel-zero/phar-updater/Static%20Analysis.svg?style=flat-square&label=Static%20Analysis)](https://github.com/laravel-zero/phar-updater/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/laravel-zero/phar-updater/tests.yml.svg?branch=main&style=flat-square)](https://github.com/laravel-zero/phar-updater/actions)
+[![Static Analysis](https://img.shields.io/github/actions/workflow/status/laravel-zero/phar-updater/static.yml.svg?branch=main&style=flat-square&label=Static%20Analysis)](https://github.com/laravel-zero/phar-updater/actions)
 [![Total Downloads](https://img.shields.io/packagist/dt/laravel-zero/phar-updater.svg?style=flat-square)](https://packagist.org/packages/laravel-zero/phar-updater)
 
 > This is a fork of the [Humbug PHAR Updater](https://github.com/humbug/phar-updater) for internal use in Laravel Zero.
