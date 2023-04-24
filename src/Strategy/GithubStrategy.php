@@ -116,9 +116,10 @@ class GithubStrategy implements StrategyInterface
          * Setup remote URL if there's an actual version to download.
          */
         if (! empty($this->remoteVersion)) {
-            $chosenVersion = array_filter($package['packages'][$this->getPackageName()], function (array $package) {
+            $remoteVersionPackages = array_filter($package['packages'][$this->getPackageName()], function (array $package) {
                 return $package['version'] === $this->remoteVersion;
-            })[0];
+            });
+            $chosenVersion = reset($remoteVersionPackages);
 
             $this->remoteUrl = $this->getDownloadUrl($chosenVersion);
         }
