@@ -141,6 +141,9 @@ class UpdaterGithubStrategyTest extends TestCase
             'packages' => [
                 'humbug/test-phar' => [
                     [
+                        'version' => '2.0.0-beta.1',
+                    ],
+                    [
                         'version' => '1.0.1',
                         'source' => [
                             'url' => 'file://'.$this->tmp.'.git',
