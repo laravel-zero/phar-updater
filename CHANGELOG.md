@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), and this 
 
 ## Unreleased
 
+## [v1.4.0 - 2023-09-01](https://github.com/laravel-zero/phar-updater/compare/v1.3.0...v1.4.0)
+
+### Changed
+- Update to Pint 1.12.x ([#13](https://github.com/laravel-zero/phar-updater/pull/13))
+
+### Fixed
+- Resolve `getCurrentRemoteVersion()` when latest is unstable ([#12](https://github.com/laravel-zero/phar-updater/pull/12))
+
+### Removed
+- Drop support for PHP 8.0 ([#13](https://github.com/laravel-zero/phar-updater/pull/13))
+
 ## [v1.3.0 - 2022-02-04](https://github.com/laravel-zero/phar-updater/compare/v1.2.0...v1.3.0)
 
 ### Added
