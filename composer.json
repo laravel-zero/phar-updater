@@ -21,9 +21,9 @@
     },
     "require-dev": {
         "ext-json": "*",
-        "laravel/pint": "^1.4",
-        "phpstan/phpstan": "^1.9.8",
-        "phpunit/phpunit": "^9.5"
+        "laravel/pint": "^1.12",
+        "phpstan/phpstan": "^1.10.32",
+        "phpunit/phpunit": "^9.6.11"
     },
     "autoload": {
         "psr-4": { "Humbug\\SelfUpdate\\": "src/" }

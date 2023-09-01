@@ -12,9 +12,10 @@
 
 namespace Humbug\SelfUpdate\Strategy;
 
-use function file_get_contents;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Updater;
+
+use function file_get_contents;
 
 /**
  * @deprecated 1.0.4 SHA-1 is increasingly susceptible to collision attacks; use SHA-256 or SHA-512
@@ -24,7 +25,6 @@ class ShaStrategy extends ShaStrategyAbstract
     /**
      * Retrieve the current version available remotely.
      *
-     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater)
@@ -56,7 +56,6 @@ class ShaStrategy extends ShaStrategyAbstract
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater)

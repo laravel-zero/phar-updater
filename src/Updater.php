@@ -90,9 +90,9 @@ class Updater
     protected $restorePath;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    protected $newVersionAvailable;
+    protected $newVersionAvailable = null;
 
     /**
      * Constructor.

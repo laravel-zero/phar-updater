@@ -12,10 +12,11 @@
 
 namespace Humbug\SelfUpdate\Strategy;
 
-use function file_get_contents;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Updater;
+
+use function file_get_contents;
 
 abstract class ShaStrategyAbstract implements StrategyInterface
 {
@@ -39,7 +40,6 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     /**
      * Download the remote Phar file.
      *
-     * @param  Updater  $updater
      * @return void
      */
     public function download(Updater $updater)

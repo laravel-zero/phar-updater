@@ -7,7 +7,6 @@ use Humbug\SelfUpdate\Updater;
 
 abstract class DirectDownloadStrategyAbstract implements StrategyInterface
 {
-    /** @var string */
     protected string $localVersion;
 
     abstract public function getDownloadUrl(): string;

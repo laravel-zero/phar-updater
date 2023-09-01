@@ -12,16 +12,16 @@
 
 namespace Humbug\SelfUpdate\Strategy;
 
-use function file_get_contents;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Updater;
+
+use function file_get_contents;
 
 final class Sha256Strategy extends ShaStrategyAbstract
 {
     /**
      * Retrieve the current version available remotely.
      *
-     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater)
@@ -53,7 +53,6 @@ final class Sha256Strategy extends ShaStrategyAbstract
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater)

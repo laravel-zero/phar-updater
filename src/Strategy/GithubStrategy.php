@@ -12,12 +12,13 @@
 
 namespace Humbug\SelfUpdate\Strategy;
 
-use function file_get_contents;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\JsonParsingException;
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\VersionParser;
+
+use function file_get_contents;
 
 class GithubStrategy implements StrategyInterface
 {
@@ -62,7 +63,6 @@ class GithubStrategy implements StrategyInterface
     /**
      * Download the remote Phar file.
      *
-     * @param  Updater  $updater
      * @return void
      */
     public function download(Updater $updater)
@@ -84,7 +84,6 @@ class GithubStrategy implements StrategyInterface
     /**
      * Retrieve the current version available remotely.
      *
-     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater)
@@ -130,7 +129,6 @@ class GithubStrategy implements StrategyInterface
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater)

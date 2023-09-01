@@ -19,7 +19,6 @@ interface StrategyInterface
     /**
      * Download the remote Phar file.
      *
-     * @param  Updater  $updater
      * @return void
      */
     public function download(Updater $updater);
@@ -27,7 +26,6 @@ interface StrategyInterface
     /**
      * Retrieve the current version available remotely.
      *
-     * @param  Updater  $updater
      * @return string|bool
      */
     public function getCurrentRemoteVersion(Updater $updater);
@@ -35,7 +33,6 @@ interface StrategyInterface
     /**
      * Retrieve the current version of the local phar file.
      *
-     * @param  Updater  $updater
      * @return string
      */
     public function getCurrentLocalVersion(Updater $updater);
