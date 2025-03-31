@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), and this 
 
 ## Unreleased
 
+## [v1.4.1 - 2025-03-31](https://github.com/laravel-zero/phar-updater/compare/v1.4.0...v1.4.1)
+
+### Changed
+- Update to Pint 1.21.x ([#14](https://github.com/laravel-zero/phar-updater/pull/14))
+- Update to PHPStan 2.x ([#14](https://github.com/laravel-zero/phar-updater/pull/14))
+- Update to PHPUnit 11.x ([#14](https://github.com/laravel-zero/phar-updater/pull/14))
+
+### Removed
+- Drop support for PHP 8.1 ([#14](https://github.com/laravel-zero/phar-updater/pull/14))
+
 ## [v1.4.0 - 2023-09-01](https://github.com/laravel-zero/phar-updater/compare/v1.3.0...v1.4.0)
 
 ### Changed
