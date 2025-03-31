@@ -16,7 +16,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -26,7 +26,7 @@ jobs:
           coverage: none
 
       - name: Install PHP dependencies
-        uses: ramsey/composer-install@v1
+        uses: ramsey/composer-install@v3
         with:
           dependency-versions: highest
           composer-options: "--prefer-dist"
@@ -45,7 +45,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -53,8 +53,11 @@ jobs:
         php-version: 8.2
         coverage: none
 
-    - name: Install Dependencies
-      run: composer update --prefer-stable --no-interaction --prefer-dist --no-progress --ansi
+    - name: Install PHP dependencies
+      uses: ramsey/composer-install@v3
+      with:
+        dependency-versions: highest
+        composer-options: "--prefer-dist"
 
     - name: Run PHPStan
       run: vendor/bin/phpstan analyse --no-progress --ansi
