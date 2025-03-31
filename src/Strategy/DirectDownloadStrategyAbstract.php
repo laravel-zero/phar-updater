@@ -18,7 +18,7 @@ abstract class DirectDownloadStrategyAbstract implements StrategyInterface
         set_error_handler([$updater, 'throwHttpRequestException']);
         $result = file_get_contents($this->getDownloadUrl());
         restore_error_handler();
-        if (false === $result) {
+        if ($result === false) {
             throw new HttpRequestException(sprintf(
                 'Request to URL failed: %s',
                 $this->getDownloadUrl()

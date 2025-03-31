@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -322,7 +323,7 @@ class Updater
 
     public function throwRuntimeException($errno, $errstr)
     {
-        if (E_USER_DEPRECATED === $errno) {
+        if ($errno === E_USER_DEPRECATED) {
             return;
         }
 
@@ -331,7 +332,7 @@ class Updater
 
     public function throwHttpRequestException($errno, $errstr)
     {
-        if (E_USER_DEPRECATED === $errno) {
+        if ($errno === E_USER_DEPRECATED) {
             return;
         }
 
@@ -433,7 +434,7 @@ class Updater
 
     protected function getBackupPharFile()
     {
-        if (null !== $this->getBackupPath()) {
+        if ($this->getBackupPath() !== null) {
             return $this->getBackupPath();
         }
 
@@ -444,7 +445,7 @@ class Updater
 
     protected function getRestorePharFile()
     {
-        if (null !== $this->getRestorePath()) {
+        if ($this->getRestorePath() !== null) {
             return $this->getRestorePath();
         }
 
@@ -536,7 +537,7 @@ class Updater
 
     protected function cleanupAfterError()
     {
-        //@unlink($this->getBackupPharFile());
+        // @unlink($this->getBackupPharFile());
         @unlink($this->getTempPharFile());
         @unlink($this->getTempPubKeyFile());
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -10,6 +11,4 @@
 
 namespace Humbug\SelfUpdate\Exception;
 
-class RuntimeException extends \RuntimeException implements ExceptionInterface
-{
-}
+class RuntimeException extends \RuntimeException implements ExceptionInterface {}

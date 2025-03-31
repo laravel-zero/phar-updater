@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -183,9 +184,9 @@ class VersionParser
             return false;
         }
         if (! empty($match[1])) {
-            if ('beta' === $match[1] || 'b' === $match[1]
-            || 'alpha' === $match[1] || 'a' === $match[1]
-            || 'rc' === $match[1]) {
+            if ($match[1] === 'beta' || $match[1] === 'b'
+            || $match[1] === 'alpha' || $match[1] === 'a'
+            || $match[1] === 'rc') {
                 return false;
             }
         }
@@ -195,10 +196,10 @@ class VersionParser
 
     private function development($version)
     {
-        if ('dev-' === substr($version, 0, 4) || '-dev' === substr($version, -4)) {
+        if (substr($version, 0, 4) === 'dev-' || substr($version, -4) === '-dev') {
             return true;
         }
-        if (1 == preg_match("/-\d+-[a-z0-9]{8,}$/", $version)) {
+        if (preg_match("/-\d+-[a-z0-9]{8,}$/", $version) == 1) {
             return true;
         }
 

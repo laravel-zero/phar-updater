@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -22,18 +23,14 @@ use function file_get_contents;
  */
 class ShaStrategy extends ShaStrategyAbstract
 {
-    /**
-     * Retrieve the current version available remotely.
-     *
-     * @return string|bool
-     */
+    /** {@inheritdoc} */
     public function getCurrentRemoteVersion(Updater $updater)
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler([$updater, 'throwHttpRequestException']);
         $version = file_get_contents($this->getVersionUrl());
         restore_error_handler();
-        if (false === $version) {
+        if ($version === false) {
             throw new HttpRequestException(sprintf(
                 'Request to URL failed: %s',
                 $this->getVersionUrl()
@@ -53,11 +50,7 @@ class ShaStrategy extends ShaStrategyAbstract
         return $matches[0];
     }
 
-    /**
-     * Retrieve the current version of the local phar file.
-     *
-     * @return string
-     */
+    /** {@inheritdoc} */
     public function getCurrentLocalVersion(Updater $updater)
     {
         return sha1_file($updater->getLocalPharFile());

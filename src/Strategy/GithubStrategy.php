@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -60,18 +61,14 @@ class GithubStrategy implements StrategyInterface
      */
     private $stability = self::STABLE;
 
-    /**
-     * Download the remote Phar file.
-     *
-     * @return void
-     */
+    /** {@inheritdoc} */
     public function download(Updater $updater)
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler([$updater, 'throwHttpRequestException']);
         $result = file_get_contents($this->remoteUrl);
         restore_error_handler();
-        if (false === $result) {
+        if ($result === false) {
             throw new HttpRequestException(sprintf(
                 'Request to URL failed: %s',
                 $this->remoteUrl
@@ -81,11 +78,7 @@ class GithubStrategy implements StrategyInterface
         file_put_contents($updater->getTempPharFile(), $result);
     }
 
-    /**
-     * Retrieve the current version available remotely.
-     *
-     * @return string|bool
-     */
+    /** {@inheritdoc} */
     public function getCurrentRemoteVersion(Updater $updater)
     {
         /** Switch remote request errors to HttpRequestExceptions */
@@ -94,7 +87,7 @@ class GithubStrategy implements StrategyInterface
         $package = json_decode(file_get_contents($packageUrl), true);
         restore_error_handler();
 
-        if (null === $package || json_last_error() !== JSON_ERROR_NONE) {
+        if ($package === null || json_last_error() !== JSON_ERROR_NONE) {
             throw new JsonParsingException(
                 'Error parsing JSON package data'
                 .(function_exists('json_last_error_msg') ? ': '.json_last_error_msg() : '')
@@ -126,11 +119,7 @@ class GithubStrategy implements StrategyInterface
         return $this->remoteVersion;
     }
 
-    /**
-     * Retrieve the current version of the local phar file.
-     *
-     * @return string
-     */
+    /** {@inheritdoc} */
     public function getCurrentLocalVersion(Updater $updater)
     {
         return $this->localVersion;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -24,25 +25,25 @@ class UpdaterGithubStrategyTest extends TestCase
 
     private $tmp;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->tmp = sys_get_temp_dir();
         $this->files = __DIR__.'/_files';
         $this->updater = new Updater($this->files.'/test.phar', false, Updater::STRATEGY_GITHUB);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->deleteTempPhars();
     }
 
-    public function testConstruction(): void
+    public function test_construction(): void
     {
         $updater = new Updater(null, false, Updater::STRATEGY_GITHUB);
         $this->assertInstanceOf(GithubStrategy::class, $updater->getStrategy());
     }
 
-    public function testSetCurrentLocalVersion(): void
+    public function test_set_current_local_version(): void
     {
         $this->updater->getStrategy()->setCurrentLocalVersion('1.0');
         $this->assertEquals(
@@ -51,7 +52,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetPharName(): void
+    public function test_set_phar_name(): void
     {
         $this->updater->getStrategy()->setPharName('foo.phar');
         $this->assertEquals(
@@ -60,7 +61,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetPackageName(): void
+    public function test_set_package_name(): void
     {
         $this->updater->getStrategy()->setPackageName('foo/bar');
         $this->assertEquals(
@@ -69,7 +70,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetStability(): void
+    public function test_set_stability(): void
     {
         $this->assertEquals(
             'stable',
@@ -82,7 +83,7 @@ class UpdaterGithubStrategyTest extends TestCase
         );
     }
 
-    public function testSetStabilityThrowsExceptionOnInvalidStabilityValue(): void
+    public function test_set_stability_throws_exception_on_invalid_stability_value(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->updater->getStrategy()->setStability('foo');
@@ -91,7 +92,7 @@ class UpdaterGithubStrategyTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testUpdatePhar(): void
+    public function test_update_phar(): void
     {
         if (! extension_loaded('openssl')) {
             $this->markTestSkipped('This test requires the openssl extension to run.');

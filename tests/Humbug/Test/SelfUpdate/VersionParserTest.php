@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -17,7 +18,7 @@ class VersionParserTest extends TestCase
 {
     // Stable Versions
 
-    public function testShouldSelectNothingFromUnstablesIfStableRequested(): void
+    public function test_should_select_nothing_from_unstables_if_stable_requested(): void
     {
         $versions = ['1.0.0a', '1.0.0alpha', '1.0.0-dev', 'dev-1.0.0', '1.0.0b',
             '1.0.0beta', '1.0.0rc', '1.0.0RC', ];
@@ -25,42 +26,42 @@ class VersionParserTest extends TestCase
         $this->assertFalse($parser->getMostRecentStable());
     }
 
-    public function testShouldSelectMostRecentVersionFromStandardSelection(): void
+    public function test_should_select_most_recent_version_from_standard_selection(): void
     {
         $versions = ['1.0.0', '1.0.1', '1.1.0'];
         $parser = new VersionParser($versions);
         $this->assertSame('1.1.0', $parser->getMostRecentStable());
     }
 
-    public function testShouldSelectMostRecentVersionFromMixedSelection(): void
+    public function test_should_select_most_recent_version_from_mixed_selection(): void
     {
         $versions = ['1.0.0', '1.0.1', '1.1.0', '1.2.0a', '1.2.0b', '1.1.0rc'];
         $parser = new VersionParser($versions);
         $this->assertSame('1.1.0', $parser->getMostRecentStable());
     }
 
-    public function testShouldSelectMostRecentVersionFromPrefixedSelection(): void
+    public function test_should_select_most_recent_version_from_prefixed_selection(): void
     {
         $versions = ['v1.0.0', 'v1.0.1', 'v1.1.0'];
         $parser = new VersionParser($versions);
         $this->assertSame('v1.1.0', $parser->getMostRecentStable());
     }
 
-    public function testShouldSelectMostRecentVersionFromPartlyPrefixedSelection(): void
+    public function test_should_select_most_recent_version_from_partly_prefixed_selection(): void
     {
         $versions = ['v1.0.0', 'v1.0.1', '1.1.0'];
         $parser = new VersionParser($versions);
         $this->assertSame('1.1.0', $parser->getMostRecentStable());
     }
 
-    public function testShouldSelectMostRecentVersionFromPatchLevels(): void
+    public function test_should_select_most_recent_version_from_patch_levels(): void
     {
         $versions = ['1.0.0', '1.0.0-pl2', '1.0.0-pl3', '1.0.0-pl1'];
         $parser = new VersionParser($versions);
         $this->assertSame('1.0.0-pl3', $parser->getMostRecentStable());
     }
 
-    public function testShouldSelectMostRecentVersionFromPatchLevels2(): void
+    public function test_should_select_most_recent_version_from_patch_levels2(): void
     {
         $versions = ['1.0.0', '1.0.0pl2', '1.0.0pl3', '1.0.0pl1'];
         $parser = new VersionParser($versions);
@@ -69,21 +70,21 @@ class VersionParserTest extends TestCase
 
     // Unstable
 
-    public function testShouldSelectNothingFromUnstablesIfUnstableRequested(): void
+    public function test_should_select_nothing_from_unstables_if_unstable_requested(): void
     {
         $versions = ['1.0.0', '1.0.1', '1.1.0'];
         $parser = new VersionParser($versions);
         $this->assertFalse($parser->getMostRecentUnstable());
     }
 
-    public function testShouldSelectNothingFromStablesOrDevsIfUnstableRequested(): void
+    public function test_should_select_nothing_from_stables_or_devs_if_unstable_requested(): void
     {
         $versions = ['1.0.0', '1.0.1', '1.1.0-dev', 'dev-1.1.1'];
         $parser = new VersionParser($versions);
         $this->assertFalse($parser->getMostRecentUnstable());
     }
 
-    public function testShouldSelectMostRecentUnstableVersionFromStandardSelection(): void
+    public function test_should_select_most_recent_unstable_version_from_standard_selection(): void
     {
         $versions = ['1.0.0a', '1.0.0alpha', '1.0.0-dev', 'dev-1.0.0', '1.0.0b',
             '1.0.0beta', '1.0.0rc', '1.0.0RC', ];
@@ -91,28 +92,28 @@ class VersionParserTest extends TestCase
         $this->assertSame('1.0.0rc', $parser->getMostRecentUnstable());
     }
 
-    public function testShouldSelectMostRecentUnstableVersionFromMixedSelection(): void
+    public function test_should_select_most_recent_unstable_version_from_mixed_selection(): void
     {
         $versions = ['1.0.0', '1.0.1', '1.1.0', '1.2.0a', '1.2.0b', '1.1.0rc'];
         $parser = new VersionParser($versions);
         $this->assertSame('1.2.0b', $parser->getMostRecentUnstable());
     }
 
-    public function testShouldSelectMostRecentUnstableVersionFromPrefixedSelection(): void
+    public function test_should_select_most_recent_unstable_version_from_prefixed_selection(): void
     {
         $versions = ['v1.0.0b', 'v1.0.1', 'v1.1.0'];
         $parser = new VersionParser($versions);
         $this->assertSame('v1.0.0b', $parser->getMostRecentUnstable());
     }
 
-    public function testShouldSelectMostRecentUnstableVersionFromPartlyPrefixedSelection(): void
+    public function test_should_select_most_recent_unstable_version_from_partly_prefixed_selection(): void
     {
         $versions = ['v1.0.0b', 'v1.0.0a', '1.1.0a'];
         $parser = new VersionParser($versions);
         $this->assertSame('1.1.0a', $parser->getMostRecentUnstable());
     }
 
-    public function testShouldSelectMostRecentUnstableFromVaryingNumeralCounts(): void
+    public function test_should_select_most_recent_unstable_from_varying_numeral_counts(): void
     {
         $versions = ['1.0-dev', '1.0.0-alpha1'];
         $parser = new VersionParser($versions);
@@ -121,7 +122,7 @@ class VersionParserTest extends TestCase
 
     // All versions (ignoring stability)
 
-    public function testShouldSelectMostRecentIgnoringStabilityExceptDevFromPrefixedSelection(): void
+    public function test_should_select_most_recent_ignoring_stability_except_dev_from_prefixed_selection(): void
     {
         $versions = ['v1.0.0b', 'v1.0.1', 'v1.1.0a', 'v1.2.0-dev'];
         $parser = new VersionParser($versions);
@@ -130,7 +131,7 @@ class VersionParserTest extends TestCase
 
     // Basic Version Category Checks
 
-    public function testIsStable(): void
+    public function test_is_stable(): void
     {
         $parser = new VersionParser;
         $this->assertTrue($parser->isStable('1.0.0'));
@@ -139,7 +140,7 @@ class VersionParserTest extends TestCase
         $this->assertFalse($parser->isStable('1.0.0-alpha1-5-g5b46ad8'));
     }
 
-    public function testIsPreRelease(): void
+    public function test_is_pre_release(): void
     {
         $parser = new VersionParser;
         $this->assertFalse($parser->isPreRelease('1.0.0'));
@@ -148,7 +149,7 @@ class VersionParserTest extends TestCase
         $this->assertFalse($parser->isPreRelease('1.0.0-alpha1-5-g5b46ad8'));
     }
 
-    public function testIsUnstable(): void
+    public function test_is_unstable(): void
     {
         $parser = new VersionParser;
         $this->assertFalse($parser->isUnstable('1.0.0'));
@@ -157,7 +158,7 @@ class VersionParserTest extends TestCase
         $this->assertTrue($parser->isUnstable('1.0.0-alpha1-5-g5b46ad8'));
     }
 
-    public function testIsDevelopment(): void
+    public function test_is_development(): void
     {
         $parser = new VersionParser;
         $this->assertFalse($parser->isDevelopment('1.0.0'));

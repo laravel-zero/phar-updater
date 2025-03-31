@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Humbug.
  *
@@ -10,6 +11,4 @@
 
 namespace Humbug\SelfUpdate\Exception;
 
-class JsonParsingException extends RuntimeException
-{
-}
+class JsonParsingException extends RuntimeException {}

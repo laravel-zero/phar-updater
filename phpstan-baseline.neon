@@ -1,0 +1,19 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method Humbug\\SelfUpdate\\Strategy\\Sha256Strategy\:\:getCurrentRemoteVersion\(\) never returns bool so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Strategy/Sha256Strategy.php
+
+		-
+			message: '#^Method Humbug\\SelfUpdate\\Strategy\\Sha512Strategy\:\:getCurrentRemoteVersion\(\) never returns bool so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Strategy/Sha512Strategy.php
+
+		-
+			message: '#^Call to function is_bool\(\) with bool will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Updater.php

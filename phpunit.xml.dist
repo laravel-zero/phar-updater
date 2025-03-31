@@ -3,16 +3,15 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          colors="true"
-         verbose="true"
          bootstrap="tests/bootstrap.php">
     <testsuites>
         <testsuite name="Phar-Updater Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-    <coverage processUncoveredFiles="true">
+    <source>
         <include>
             <directory suffix=".php">src</directory>
         </include>
-    </coverage>
+    </source>
 </phpunit>
