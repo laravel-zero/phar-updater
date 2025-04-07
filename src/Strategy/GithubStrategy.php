@@ -23,7 +23,7 @@ use function file_get_contents;
 
 class GithubStrategy implements StrategyInterface
 {
-    const API_URL = 'https://packagist.org/p2/%s.json';
+    const API_URL = 'https://repo.packagist.org/p2/%s.json';
 
     const STABLE = 'stable';
 
