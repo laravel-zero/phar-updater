@@ -15,7 +15,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
-    - [Basic SHA-1 / SHA-256 / SHA-512 Strategy](#basic-sha-1--sha-256--sha-512-strategy)
+    - [Basic SHA-256 / SHA-512 Strategy](#basic-sha-256--sha-512-strategy)
     - [Github Release Strategy](#github-release-strategy)
     - [Rollback Support](#rollback-support)
     - [Constructor Parameters](#constructor-parameters)
@@ -23,7 +23,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
     - [Avoid Post Update File Includes](#avoid-post-update-file-includes)
     - [Custom Update Strategies](#custom-update-strategies)
 - [Update Strategies](#update-strategies)
-    - [SHA-1 / SHA-256 / SHA-512 Hash Synchronisation](#sha-1--sha-256--sha-512-hash-synchronisation)
+    - [SHA-256 / SHA-512 Hash Synchronisation](#sha-256--sha-512-hash-synchronisation)
     - [Github Releases](#github-releases)
     - [Direct Downloads](#direct-downloads)
 - [Change log](#change-log)
@@ -34,7 +34,7 @@ The `laravel-zero/phar-updater` package has the following features:
 
 * Full support for SSL/TLS verification.
 * Simple API where it either updates or Exceptions will go wild.
-* Support for SHA-1/SHA-256/SHA-512 version synchronisation and Github Releases as update strategies.
+* Support for SHA-256/SHA-512 version synchronisation and Github Releases as update strategies.
 
 Apart from the detailed documentation below, you can find the package being used within
 [Laravel Zero's self-update component](https://github.com/laravel-zero/framework/blob/master/src/Components/Updater).
@@ -58,13 +58,14 @@ setting to both be enabled. Support for curl will follow in time.
 
 ## Usage
 
-The default update strategy uses an SHA-1 hash of the current remote phar in a version file, and will update the local
+The default update strategy uses a SHA-512 hash of the current remote phar in a version file, and will update the local
 phar when this version is changed. There is also a Github strategy which tracks Github Releases where you can upload a
 new phar file for a release.
 
-### Basic SHA-1 / SHA-256 / SHA-512 Strategy
+### Basic SHA-256 / SHA-512 Strategy
 
-> NOTE: The SHA-1 strategy is marked as deprecated, you should prefer the SHA-256 or SHA-512 strategies instead.
+> NOTE: The SHA-1 strategy has been removed. If you were using it, switch to the default SHA-512 strategy (which is what
+> [Box](https://github.com/box-project/box) generates by default) and publish a SHA-512 version file instead.
 
 Create your self-update command, or even an update command for some other phar other than the current one, and include
 this.
@@ -81,7 +82,7 @@ use Humbug\SelfUpdate\Updater;
 
 $updater = new Updater();
 
-// Add the below to use the SHA-256 strategy. It will default to SHA-1 if excluded.
+// Add the below to use the SHA-256 strategy. It will default to SHA-512 if excluded.
 $updater->setStrategy(Updater::STRATEGY_SHA256);
 
 $updater->getStrategy()->setPharUrl('https://example.com/current.phar');
@@ -109,7 +110,7 @@ try {
         $new = $updater->getNewVersion();
         $old = $updater->getOldVersion();
         printf(
-            'Updated from SHA-1 %s to SHA-1 %s', $old, $new
+            'Updated from SHA-512 %s to SHA-512 %s', $old, $new
         );
     } else {
         echo "No update needed!\n";
@@ -120,7 +121,7 @@ try {
 }
 ```
 
-See the [Update Strategies](#update-strategies) section for an overview of how to set up the SHA-1 or SHA-256 strategy.
+See the [Update Strategies](#update-strategies) section for an overview of how to set up the SHA-256 or SHA-512 strategy.
 It's a simple to maintain choice for development or nightly versions of phars which are released to a specific numbered
 version.
 
@@ -295,9 +296,9 @@ The similar `setStrategy()` method is solely used to pass flags matching interna
 
 ## Update Strategies
 
-### SHA-1 / SHA-256 / SHA-512 Hash Synchronisation
+### SHA-256 / SHA-512 Hash Synchronisation
 
-The phar-updater package supports an update strategy where phars are updated according to the SHA-1, SHA-256, or SHA-512
+The phar-updater package supports an update strategy where phars are updated according to the SHA-256 or SHA-512
 hash of the current PHAR file available remotely. This assumes the existence of only two remote files:
 
 * myname.phar
@@ -305,13 +306,10 @@ hash of the current PHAR file available remotely. This assumes the existence of 
 
 The `myname.phar` is the most recently built phar.
 
-The `myname.version` contains the SHA-1, SHA-256, or SHA-512 hash of the most recently built phar where the hash is the very first
+The `myname.version` contains the SHA-256 or SHA-512 hash of the most recently built phar where the hash is the very first
 string (if not the only string). You can generate this quite easily from bash using:
 
 ```bash
-# For SHA-1
-sha1sum myname.phar > myname.version
-
 # For SHA-256
 sha256sum myname.phar > myname.version
 
@@ -319,7 +317,7 @@ sha256sum myname.phar > myname.version
 sha512sum myname.phar > myname.version
 ```
 
-Remember to regenerate the version file for each new phar build you want to distribute. Using `sha1sum`/`sha256sum`/`sha512sum`
+Remember to regenerate the version file for each new phar build you want to distribute. Using `sha256sum`/`sha512sum`
 adds additional data after the hash, but it's fine since the hash is the first string in the file which is the only
 requirement.
 

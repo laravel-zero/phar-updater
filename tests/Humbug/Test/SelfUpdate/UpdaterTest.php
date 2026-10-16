@@ -15,6 +15,7 @@ namespace Humbug\Test\SelfUpdate;
 
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
+use Humbug\SelfUpdate\Strategy\Sha512Strategy;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
 use Humbug\SelfUpdate\Updater;
 use PHPUnit\Framework\TestCase;
@@ -52,6 +53,18 @@ class UpdaterTest extends TestCase
             'phpunit.phar',
             basename($updater->getLocalPharFile(), '.phar').'.phar'
         );
+    }
+
+    public function test_construction_defaults_to_sha512_strategy(): void
+    {
+        $this->assertInstanceOf(Sha512Strategy::class, $this->updater->getStrategy());
+    }
+
+    public function test_constructor_throws_exception_on_unknown_strategy(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown update strategy: sha1.');
+        new Updater($this->files.'/test.phar', 'sha1');
     }
 
     public function test_constructor_ancilliary_values(): void
@@ -92,10 +105,16 @@ class UpdaterTest extends TestCase
 
     public function test_can_detect_new_remote_version_and_store_versions(): void
     {
-        $this->updater->getStrategy()->setVersionUrl('file://'.$this->files.'/good.version');
+        $this->updater->getStrategy()->setVersionUrl('file://'.$this->files.'/good.sha512.version');
         $this->assertTrue($this->updater->hasUpdate());
-        $this->assertEquals('da39a3ee5e6b4b0d3255bfef95601890afd80709', $this->updater->getOldVersion());
-        $this->assertEquals('1af1b9c94dea1ff337587bfa9109f1dad1ec7b9b', $this->updater->getNewVersion());
+        $this->assertEquals(
+            'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e',
+            $this->updater->getOldVersion()
+        );
+        $this->assertEquals(
+            'b8a705a7430e69f23594c4bf58e8110d0e00e2fe0eb88cfdb5980a825b5734dc4c54e4cebba44e0424b1a79303745b8fb662d65eb34b35da51fd3347e6302902',
+            $this->updater->getNewVersion()
+        );
     }
 
     public function test_throws_exception_on_empty_remote_version(): void
@@ -124,7 +143,7 @@ class UpdaterTest extends TestCase
 
         $updater = new Updater($this->tmp.'/old.phar');
         $updater->getStrategy()->setPharUrl('file://'.$this->files.'/build/new.phar');
-        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/new.version');
+        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/new.sha512.version');
         $this->assertTrue($updater->update());
         $this->assertEquals('new', $this->getPharOutput($this->tmp.'/old.phar'));
     }
@@ -141,7 +160,7 @@ class UpdaterTest extends TestCase
 
         $updater = new Updater($this->tmp.'/old.phar');
         $updater->getStrategy()->setPharUrl('file://'.$this->files.'/build/tampered.phar');
-        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/tampered.version');
+        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/tampered.sha512.version');
 
         try {
             $updater->update();

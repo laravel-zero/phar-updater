@@ -17,18 +17,16 @@ namespace Humbug\SelfUpdate;
 
 use Humbug\SelfUpdate\Exception\FilesystemException;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
+use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Strategy\Sha256Strategy;
 use Humbug\SelfUpdate\Strategy\Sha512Strategy;
-use Humbug\SelfUpdate\Strategy\ShaStrategy;
 use Humbug\SelfUpdate\Strategy\ShaStrategyAbstract;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
 
 class Updater
 {
-    const string STRATEGY_SHA1 = 'sha1';
-
     const string STRATEGY_SHA256 = 'sha256';
 
     const string STRATEGY_SHA512 = 'sha512';
@@ -55,7 +53,7 @@ class Updater
 
     protected ?bool $newVersionAvailable = null;
 
-    public function __construct(?string $localPharFile = null, string $strategy = self::STRATEGY_SHA1)
+    public function __construct(?string $localPharFile = null, string $strategy = self::STRATEGY_SHA512)
     {
         ini_set('phar.require_hash', '1');
         $this->setLocalPharFile($localPharFile);
@@ -107,7 +105,10 @@ class Updater
             self::STRATEGY_GITHUB => new GithubStrategy,
             self::STRATEGY_SHA256 => new Sha256Strategy,
             self::STRATEGY_SHA512 => new Sha512Strategy,
-            default => new ShaStrategy,
+            default => throw new InvalidArgumentException(sprintf(
+                'Unknown update strategy: %s.',
+                $strategy
+            )),
         };
     }
 
@@ -287,10 +288,7 @@ class Updater
         $strategy = $this->getStrategy();
 
         if ($strategy instanceof ShaStrategyAbstract) {
-            if ($strategy instanceof ShaStrategy) {
-                $tmpVersion = sha1_file($this->getTempPharFile());
-                $algo = 'SHA-1';
-            } elseif ($strategy instanceof Sha512Strategy) {
+            if ($strategy instanceof Sha512Strategy) {
                 $tmpVersion = hash_file('sha512', $this->getTempPharFile());
                 $algo = 'SHA-512';
             } else {
