@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Humbug\SelfUpdate\Strategy;
 
+use Humbug\SelfUpdate\Exception\FilesystemException;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Updater;
 
@@ -9,8 +12,8 @@ use function file_get_contents;
 
 final class Sha512Strategy extends ShaStrategyAbstract
 {
-    /** {@inheritdoc} */
-    public function getCurrentRemoteVersion(Updater $updater)
+    #[\Override]
+    public function getCurrentRemoteVersion(Updater $updater): string
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler([$updater, 'throwHttpRequestException']);
@@ -36,9 +39,17 @@ final class Sha512Strategy extends ShaStrategyAbstract
         return $matches[0];
     }
 
-    /** {@inheritdoc} */
-    public function getCurrentLocalVersion(Updater $updater)
+    #[\Override]
+    public function getCurrentLocalVersion(Updater $updater): string
     {
-        return hash_file('sha512', $updater->getLocalPharFile());
+        $version = hash_file('sha512', $updater->getLocalPharFile());
+        if ($version === false) {
+            throw new FilesystemException(sprintf(
+                'Unable to hash the local phar file: %s.',
+                $updater->getLocalPharFile()
+            ));
+        }
+
+        return $version;
     }
 }

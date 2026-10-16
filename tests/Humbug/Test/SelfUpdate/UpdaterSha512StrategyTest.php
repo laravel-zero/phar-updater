@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -19,12 +21,11 @@ use PHPUnit\Framework\TestCase;
 
 class UpdaterSha512StrategyTest extends TestCase
 {
-    private $files;
+    private string $files;
 
-    /** @var Updater */
-    private $updater;
+    private Updater $updater;
 
-    private $tmp;
+    private string $tmp;
 
     protected function setup(): void
     {

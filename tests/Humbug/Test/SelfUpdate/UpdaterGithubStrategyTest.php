@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -18,12 +20,11 @@ use PHPUnit\Framework\TestCase;
 
 class UpdaterGithubStrategyTest extends TestCase
 {
-    private $files;
+    private string $files;
 
-    /** @var Updater */
-    private $updater;
+    private Updater $updater;
 
-    private $tmp;
+    private string $tmp;
 
     protected function setUp(): void
     {
@@ -150,6 +151,7 @@ class UpdaterGithubStrategyTest extends TestCase
 
 class GithubTestStrategy extends GithubStrategy
 {
+    #[\Override]
     protected function getApiUrl(): string
     {
         return 'file://'.sys_get_temp_dir().'/packages.json';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -21,25 +23,18 @@ use function file_get_contents;
 
 abstract class ShaStrategyAbstract implements StrategyInterface
 {
-    /** @private */
-    const SUPPORTED_SCHEMES = [
+    private const array SUPPORTED_SCHEMES = [
         'http',
         'https',
         'file',
     ];
 
-    /**
-     * @var string
-     */
-    protected $versionUrl;
+    protected string $versionUrl = '';
 
-    /**
-     * @var string
-     */
-    protected $pharUrl;
+    protected string $pharUrl = '';
 
-    /** {@inheritdoc} */
-    public function download(Updater $updater)
+    #[\Override]
+    public function download(Updater $updater): void
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler([$updater, 'throwHttpRequestException']);
@@ -57,10 +52,8 @@ abstract class ShaStrategyAbstract implements StrategyInterface
 
     /**
      * Set URL to phar file.
-     *
-     * @param  string  $url
      */
-    public function setPharUrl($url)
+    public function setPharUrl(string $url): void
     {
         if (! $this->validateAllowedUrl($url)) {
             throw new InvalidArgumentException(
@@ -72,20 +65,16 @@ abstract class ShaStrategyAbstract implements StrategyInterface
 
     /**
      * Get URL for phar file.
-     *
-     * @return string
      */
-    public function getPharUrl()
+    public function getPharUrl(): string
     {
         return $this->pharUrl;
     }
 
     /**
      * Set URL to version file.
-     *
-     * @param  string  $url
      */
-    public function setVersionUrl($url)
+    public function setVersionUrl(string $url): void
     {
         if (! $this->validateAllowedUrl($url)) {
             throw new InvalidArgumentException(
@@ -97,18 +86,16 @@ abstract class ShaStrategyAbstract implements StrategyInterface
 
     /**
      * Get URL for version file.
-     *
-     * @return string
      */
-    public function getVersionUrl()
+    public function getVersionUrl(): string
     {
         return $this->versionUrl;
     }
 
-    protected function validateAllowedUrl($url)
+    protected function validateAllowedUrl(string $url): bool
     {
         return
-            filter_var($url, FILTER_VALIDATE_URL)
-            && in_array(parse_url($url, PHP_URL_SCHEME), self::SUPPORTED_SCHEMES);
+            filter_var($url, FILTER_VALIDATE_URL) !== false
+            && in_array(parse_url($url, PHP_URL_SCHEME), self::SUPPORTED_SCHEMES, true);
     }
 }

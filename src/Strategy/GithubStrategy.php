@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -18,51 +20,34 @@ use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\JsonParsingException;
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\VersionParser;
+use JsonException;
 
 use function file_get_contents;
 
 class GithubStrategy implements StrategyInterface
 {
-    const API_URL = 'https://repo.packagist.org/p2/%s.json';
+    const string API_URL = 'https://repo.packagist.org/p2/%s.json';
 
-    const STABLE = 'stable';
+    const string STABLE = 'stable';
 
-    const UNSTABLE = 'unstable';
+    const string UNSTABLE = 'unstable';
 
-    const ANY = 'any';
+    const string ANY = 'any';
 
-    /**
-     * @var string
-     */
-    private $localVersion;
+    private string $localVersion = '';
 
-    /**
-     * @var string
-     */
-    private $remoteVersion;
+    private string|false $remoteVersion = false;
 
-    /**
-     * @var string
-     */
-    private $remoteUrl;
+    private string $remoteUrl = '';
 
-    /**
-     * @var string
-     */
-    private $pharName;
+    private string $pharName = '';
 
-    /**
-     * @var string
-     */
-    private $packageName;
+    private string $packageName = '';
 
-    /**
-     * @var string
-     */
-    private $stability = self::STABLE;
+    private string $stability = self::STABLE;
 
-    /** {@inheritdoc} */
-    public function download(Updater $updater)
+    #[\Override]
+    public function download(Updater $updater): void
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler([$updater, 'throwHttpRequestException']);
@@ -78,20 +63,29 @@ class GithubStrategy implements StrategyInterface
         file_put_contents($updater->getTempPharFile(), $result);
     }
 
-    /** {@inheritdoc} */
-    public function getCurrentRemoteVersion(Updater $updater)
+    #[\Override]
+    public function getCurrentRemoteVersion(Updater $updater): string|false
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler([$updater, 'throwHttpRequestException']);
         $packageUrl = $this->getApiUrl();
-        $package = json_decode(file_get_contents($packageUrl), true);
+        $contents = file_get_contents($packageUrl);
         restore_error_handler();
+        if ($contents === false) {
+            throw new HttpRequestException(sprintf(
+                'Request to URL failed: %s',
+                $packageUrl
+            ));
+        }
 
-        if ($package === null || json_last_error() !== JSON_ERROR_NONE) {
-            throw new JsonParsingException(
-                'Error parsing JSON package data'
-                .(function_exists('json_last_error_msg') ? ': '.json_last_error_msg() : '')
-            );
+        try {
+            $package = json_decode($contents, true, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new JsonParsingException('Error parsing JSON package data: '.$e->getMessage(), previous: $e);
+        }
+
+        if (! is_array($package)) {
+            throw new JsonParsingException('Error parsing JSON package data: expected an object.');
         }
 
         $versions = array_column($package['packages'][$this->getPackageName()], 'version');
@@ -119,68 +113,56 @@ class GithubStrategy implements StrategyInterface
         return $this->remoteVersion;
     }
 
-    /** {@inheritdoc} */
-    public function getCurrentLocalVersion(Updater $updater)
+    #[\Override]
+    public function getCurrentLocalVersion(Updater $updater): string
     {
         return $this->localVersion;
     }
 
     /**
      * Set version string of the local phar.
-     *
-     * @param  string  $version
      */
-    public function setCurrentLocalVersion($version)
+    public function setCurrentLocalVersion(string $version): void
     {
         $this->localVersion = $version;
     }
 
     /**
      * Set Package name.
-     *
-     * @param  string  $name
      */
-    public function setPackageName($name)
+    public function setPackageName(string $name): void
     {
         $this->packageName = $name;
     }
 
     /**
      * Get Package name.
-     *
-     * @return string
      */
-    public function getPackageName()
+    public function getPackageName(): string
     {
         return $this->packageName;
     }
 
     /**
      * Set phar file's name.
-     *
-     * @param  string  $name
      */
-    public function setPharName($name)
+    public function setPharName(string $name): void
     {
         $this->pharName = $name;
     }
 
     /**
      * Get phar file's name.
-     *
-     * @return string
      */
-    public function getPharName()
+    public function getPharName(): string
     {
         return $this->pharName;
     }
 
     /**
      * Set target stability.
-     *
-     * @param  string  $stability
      */
-    public function setStability($stability)
+    public function setStability(string $stability): void
     {
         if ($stability !== self::STABLE && $stability !== self::UNSTABLE && $stability !== self::ANY) {
             throw new InvalidArgumentException(
@@ -192,27 +174,25 @@ class GithubStrategy implements StrategyInterface
 
     /**
      * Get target stability.
-     *
-     * @return string
      */
-    public function getStability()
+    public function getStability(): string
     {
         return $this->stability;
     }
 
-    protected function getApiUrl()
+    protected function getApiUrl(): string
     {
         return sprintf(self::API_URL, $this->getPackageName());
     }
 
     /** @param  array<mixed, mixed>  $package */
-    protected function getDownloadUrl(array $package)
+    protected function getDownloadUrl(array $package): string
     {
         $baseUrl = preg_replace(
             '{\.git$}',
             '',
             $package['source']['url']
-        );
+        ) ?? $package['source']['url'];
 
         return sprintf(
             '%s/releases/download/%s/%s',

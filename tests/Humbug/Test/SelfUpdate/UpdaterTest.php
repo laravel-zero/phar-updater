@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -20,12 +22,11 @@ use UnexpectedValueException;
 
 class UpdaterTest extends TestCase
 {
-    private $files;
+    private string $files;
 
-    /** @var Updater */
-    private $updater;
+    private Updater $updater;
 
-    private $tmp;
+    private string $tmp;
 
     protected function setUp(): void
     {
@@ -51,13 +52,6 @@ class UpdaterTest extends TestCase
             'phpunit.phar',
             basename($updater->getLocalPharFile(), '.phar').'.phar'
         );
-    }
-
-    public function test_constructor_throws_exception_if_removed_pub_key_flag_is_passed(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The $hasPubKey parameter has been removed');
-        new Updater($this->files.'/test.phar', false);
     }
 
     public function test_constructor_ancilliary_values(): void
@@ -205,9 +199,18 @@ class UpdaterTest extends TestCase
 
 class FooStrategy implements StrategyInterface
 {
-    public function download(Updater $updater) {}
+    #[\Override]
+    public function download(Updater $updater): void {}
 
-    public function getCurrentRemoteVersion(Updater $updater) {}
+    #[\Override]
+    public function getCurrentRemoteVersion(Updater $updater): string
+    {
+        return '';
+    }
 
-    public function getCurrentLocalVersion(Updater $updater) {}
+    #[\Override]
+    public function getCurrentLocalVersion(Updater $updater): string
+    {
+        return '';
+    }
 }

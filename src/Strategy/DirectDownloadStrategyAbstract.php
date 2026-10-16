@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Humbug\SelfUpdate\Strategy;
 
 use Humbug\SelfUpdate\Exception\HttpRequestException;
@@ -11,8 +13,8 @@ abstract class DirectDownloadStrategyAbstract implements StrategyInterface
 
     abstract public function getDownloadUrl(): string;
 
-    /** {@inheritdoc} */
-    public function download(Updater $updater)
+    #[\Override]
+    public function download(Updater $updater): void
     {
         /** Switch remote request errors to HttpRequestExceptions */
         set_error_handler([$updater, 'throwHttpRequestException']);
@@ -28,8 +30,8 @@ abstract class DirectDownloadStrategyAbstract implements StrategyInterface
         file_put_contents($updater->getTempPharFile(), $result);
     }
 
-    /** {@inheritdoc} */
-    public function getCurrentRemoteVersion(Updater $updater)
+    #[\Override]
+    public function getCurrentRemoteVersion(Updater $updater): string
     {
         return 'latest';
     }
@@ -39,8 +41,8 @@ abstract class DirectDownloadStrategyAbstract implements StrategyInterface
         $this->localVersion = $version;
     }
 
-    /** {@inheritdoc} */
-    public function getCurrentLocalVersion(Updater $updater)
+    #[\Override]
+    public function getCurrentLocalVersion(Updater $updater): string
     {
         return $this->localVersion;
     }

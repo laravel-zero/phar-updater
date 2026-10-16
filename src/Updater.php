@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -15,7 +17,6 @@ namespace Humbug\SelfUpdate;
 
 use Humbug\SelfUpdate\Exception\FilesystemException;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
-use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Strategy\Sha256Strategy;
@@ -26,78 +27,36 @@ use Humbug\SelfUpdate\Strategy\StrategyInterface;
 
 class Updater
 {
-    const STRATEGY_SHA1 = 'sha1';
+    const string STRATEGY_SHA1 = 'sha1';
 
-    const STRATEGY_SHA256 = 'sha256';
+    const string STRATEGY_SHA256 = 'sha256';
 
-    const STRATEGY_SHA512 = 'sha512';
+    const string STRATEGY_SHA512 = 'sha512';
 
-    const STRATEGY_GITHUB = 'github';
+    const string STRATEGY_GITHUB = 'github';
 
-    /**
-     * @var StrategyInterface
-     */
-    protected $strategy;
+    protected StrategyInterface $strategy;
 
-    /**
-     * @var string
-     */
-    protected $localPharFile;
+    protected string $localPharFile;
 
-    /**
-     * @var string
-     */
-    protected $localPharFileBasename;
+    protected string $localPharFileBasename;
 
-    /**
-     * @var string
-     */
-    protected $tempDirectory;
+    protected string $tempDirectory;
 
-    /**
-     * @var string
-     */
-    protected $newVersion;
+    protected string|false|null $newVersion = null;
 
-    /**
-     * @var string
-     */
-    protected $oldVersion;
+    protected ?string $oldVersion = null;
 
-    /**
-     * @var string
-     */
-    protected $backupExtension = '-old.phar';
+    protected string $backupExtension = '-old.phar';
 
-    /**
-     * @var string
-     */
-    protected $backupPath;
+    protected ?string $backupPath = null;
 
-    /**
-     * @var string
-     */
-    protected $restorePath;
+    protected ?string $restorePath = null;
 
-    /**
-     * @var bool|null
-     */
-    protected $newVersionAvailable = null;
+    protected ?bool $newVersionAvailable = null;
 
-    /**
-     * Constructor.
-     *
-     * @param  string  $localPharFile
-     * @param  string  $strategy
-     */
-    public function __construct($localPharFile = null, $strategy = self::STRATEGY_SHA1)
+    public function __construct(?string $localPharFile = null, string $strategy = self::STRATEGY_SHA1)
     {
-        if (! is_string($strategy)) {
-            throw new InvalidArgumentException(
-                'Constructor parameter $strategy must be a string. The $hasPubKey '
-                    .'parameter has been removed, as OpenSSL signing is no longer supported.'
-            );
-        }
         ini_set('phar.require_hash', '1');
         $this->setLocalPharFile($localPharFile);
         $this->setTempDirectory();
@@ -106,10 +65,8 @@ class Updater
 
     /**
      * Check for update.
-     *
-     * @return bool
      */
-    public function hasUpdate()
+    public function hasUpdate(): bool
     {
         $this->newVersionAvailable = $this->newVersionAvailable();
 
@@ -118,10 +75,8 @@ class Updater
 
     /**
      * Perform an update.
-     *
-     * @return bool
      */
-    public function update()
+    public function update(): bool
     {
         if ($this->newVersionAvailable === false
         || (! is_bool($this->newVersionAvailable) && ! $this->hasUpdate())) {
@@ -136,10 +91,8 @@ class Updater
 
     /**
      * Perform an rollback to previous version.
-     *
-     * @return bool
      */
-    public function rollback()
+    public function rollback(): bool
     {
         if (! $this->restorePhar()) {
             return false;
@@ -148,104 +101,88 @@ class Updater
         return true;
     }
 
-    /**
-     * @param  string  $strategy
-     */
-    public function setStrategy($strategy)
+    public function setStrategy(string $strategy): void
     {
-        switch ($strategy) {
-            case self::STRATEGY_GITHUB:
-                $this->strategy = new GithubStrategy;
-                break;
-
-            case self::STRATEGY_SHA256:
-                $this->strategy = new Sha256Strategy;
-                break;
-
-            case self::STRATEGY_SHA512:
-                $this->strategy = new Sha512Strategy;
-                break;
-
-            default:
-                $this->strategy = new ShaStrategy;
-                break;
-        }
+        $this->strategy = match ($strategy) {
+            self::STRATEGY_GITHUB => new GithubStrategy,
+            self::STRATEGY_SHA256 => new Sha256Strategy,
+            self::STRATEGY_SHA512 => new Sha512Strategy,
+            default => new ShaStrategy,
+        };
     }
 
-    public function setStrategyObject(StrategyInterface $strategy)
+    public function setStrategyObject(StrategyInterface $strategy): void
     {
         $this->strategy = $strategy;
     }
 
-    public function getStrategy()
+    public function getStrategy(): StrategyInterface
     {
         return $this->strategy;
     }
 
     /**
      * Set backup extension for old phar versions.
-     *
-     * @param  string  $extension
      */
-    public function setBackupExtension($extension)
+    public function setBackupExtension(string $extension): void
     {
         $this->backupExtension = $extension;
     }
 
     /**
      * Get backup extension for old phar versions.
-     *
-     * @return string
      */
-    public function getBackupExtension()
+    public function getBackupExtension(): string
     {
         return $this->backupExtension;
     }
 
-    public function getLocalPharFile()
+    public function getLocalPharFile(): string
     {
         return $this->localPharFile;
     }
 
-    public function getLocalPharFileBasename()
+    public function getLocalPharFileBasename(): string
     {
         return $this->localPharFileBasename;
     }
 
-    public function getTempDirectory()
+    public function getTempDirectory(): string
     {
         return $this->tempDirectory;
     }
 
-    public function getTempPharFile()
+    public function getTempPharFile(): string
     {
         return $this->getTempDirectory()
             .'/'
             .sprintf('%s.phar.temp', $this->getLocalPharFileBasename());
     }
 
-    public function getNewVersion()
+    /**
+     * Get the new version, which is false if no remote version was available,
+     * or null if no update check has been performed.
+     */
+    public function getNewVersion(): string|false|null
     {
         return $this->newVersion;
     }
 
-    public function getOldVersion()
+    public function getOldVersion(): ?string
     {
         return $this->oldVersion;
     }
 
     /**
      * Set backup path for old phar versions.
-     *
-     * @param  string  $filePath
      */
-    public function setBackupPath($filePath)
+    public function setBackupPath(string $filePath): void
     {
         $path = realpath(dirname($filePath));
-        if (! is_dir($path)) {
+        if ($path === false || ! is_dir($path)) {
             throw new FilesystemException(sprintf(
                 'The backup directory does not exist: %s.',
-                $path
+                dirname($filePath)
             ));
         }
         if (! is_writable($path)) {
@@ -259,26 +196,22 @@ class Updater
 
     /**
      * Get backup path for old phar versions.
-     *
-     * @return string|null
      */
-    public function getBackupPath()
+    public function getBackupPath(): ?string
     {
         return $this->backupPath;
     }
 
     /**
      * Set path for the backup phar to rollback/restore from.
-     *
-     * @param  string  $filePath
      */
-    public function setRestorePath($filePath)
+    public function setRestorePath(string $filePath): void
     {
         $path = realpath(dirname($filePath));
-        if (! file_exists($path)) {
+        if ($path === false || ! file_exists($path)) {
             throw new FilesystemException(sprintf(
                 'The restore phar does not exist: %s.',
-                $path
+                dirname($filePath)
             ));
         }
         if (! is_readable($path)) {
@@ -292,33 +225,31 @@ class Updater
 
     /**
      * Get path for the backup phar to rollback/restore from.
-     *
-     * @return string|null
      */
-    public function getRestorePath()
+    public function getRestorePath(): ?string
     {
         return $this->restorePath;
     }
 
-    public function throwRuntimeException($errno, $errstr)
+    public function throwRuntimeException(int $errno, string $errstr): bool
     {
         if ($errno === E_USER_DEPRECATED) {
-            return;
+            return false;
         }
 
         throw new RuntimeException($errstr);
     }
 
-    public function throwHttpRequestException($errno, $errstr)
+    public function throwHttpRequestException(int $errno, string $errstr): bool
     {
         if ($errno === E_USER_DEPRECATED) {
-            return;
+            return false;
         }
 
         throw new HttpRequestException($errstr);
     }
 
-    protected function newVersionAvailable()
+    protected function newVersionAvailable(): bool
     {
         $this->newVersion = $this->strategy->getCurrentRemoteVersion($this);
         $this->oldVersion = $this->strategy->getCurrentLocalVersion($this);
@@ -330,7 +261,7 @@ class Updater
         return false;
     }
 
-    protected function backupPhar()
+    protected function backupPhar(): void
     {
         $result = copy($this->getLocalPharFile(), $this->getBackupPharFile());
         if ($result === false) {
@@ -343,7 +274,7 @@ class Updater
         }
     }
 
-    protected function downloadPhar()
+    protected function downloadPhar(): void
     {
         $this->strategy->download($this);
 
@@ -387,12 +318,12 @@ class Updater
         }
     }
 
-    protected function replacePhar()
+    protected function replacePhar(): void
     {
         rename($this->getTempPharFile(), $this->getLocalPharFile());
     }
 
-    protected function restorePhar()
+    protected function restorePhar(): bool
     {
         $backup = $this->getRestorePharFile();
         if (! file_exists($backup)) {
@@ -406,7 +337,7 @@ class Updater
         return rename($backup, $this->getLocalPharFile());
     }
 
-    protected function getBackupPharFile()
+    protected function getBackupPharFile(): string
     {
         if ($this->getBackupPath() !== null) {
             return $this->getBackupPath();
@@ -417,7 +348,7 @@ class Updater
             .sprintf('%s%s', $this->getLocalPharFileBasename(), $this->getBackupExtension());
     }
 
-    protected function getRestorePharFile()
+    protected function getRestorePharFile(): string
     {
         if ($this->getRestorePath() !== null) {
             return $this->getRestorePath();
@@ -432,10 +363,10 @@ class Updater
             );
     }
 
-    protected function setLocalPharFile($localPharFile)
+    protected function setLocalPharFile(?string $localPharFile): void
     {
-        if (! is_null($localPharFile)) {
-            $localPharFile = realpath($localPharFile);
+        if ($localPharFile !== null) {
+            $localPharFile = realpath($localPharFile) ?: $localPharFile;
         } else {
             $localPharFile = realpath($_SERVER['argv'][0]) ?: $_SERVER['argv'][0];
         }
@@ -455,7 +386,7 @@ class Updater
         $this->localPharFileBasename = basename($localPharFile, '.phar');
     }
 
-    protected function setTempDirectory()
+    protected function setTempDirectory(): void
     {
         $tempDirectory = dirname($this->getLocalPharFile());
         if (! is_writable($tempDirectory)) {
@@ -467,10 +398,13 @@ class Updater
         $this->tempDirectory = $tempDirectory;
     }
 
-    protected function validatePhar($phar)
+    protected function validatePhar(string $phar): void
     {
-        $phar = realpath($phar);
-        chmod($phar, fileperms($this->getLocalPharFile()));
+        $phar = realpath($phar) ?: $phar;
+        $permissions = fileperms($this->getLocalPharFile());
+        if ($permissions !== false) {
+            chmod($phar, $permissions);
+        }
         /** Switch invalid phar errors to RuntimeExceptions */
         set_error_handler([$this, 'throwRuntimeException']);
         /** Opening the phar verifies its internal hash, as phar.require_hash is enabled */
@@ -479,7 +413,7 @@ class Updater
         unset($phar);
     }
 
-    protected function cleanupAfterError()
+    protected function cleanupAfterError(): void
     {
         // @unlink($this->getBackupPharFile());
         @unlink($this->getTempPharFile());

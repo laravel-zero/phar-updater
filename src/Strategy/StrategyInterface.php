@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -19,22 +21,16 @@ interface StrategyInterface
 {
     /**
      * Download the remote Phar file.
-     *
-     * @return void
      */
-    public function download(Updater $updater);
+    public function download(Updater $updater): void;
 
     /**
-     * Retrieve the current version available remotely.
-     *
-     * @return string|bool
+     * Retrieve the current version available remotely, or false if none is available.
      */
-    public function getCurrentRemoteVersion(Updater $updater);
+    public function getCurrentRemoteVersion(Updater $updater): string|false;
 
     /**
      * Retrieve the current version of the local phar file.
-     *
-     * @return string
      */
-    public function getCurrentLocalVersion(Updater $updater);
+    public function getCurrentLocalVersion(Updater $updater): string;
 }

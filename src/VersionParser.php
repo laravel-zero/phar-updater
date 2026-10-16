@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Humbug.
  *
@@ -15,64 +17,46 @@ namespace Humbug\SelfUpdate;
 
 class VersionParser
 {
-    /**
-     * @var array<int, string>
-     */
-    private $versions;
-
-    /**
-     * @var string
-     */
-    private $modifier = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)(?:[.-]?(\d+))?)?([.-]?dev)?';
+    private const string MODIFIER = '[._-]?(?:(stable|beta|b|RC|alpha|a|patch|pl|p)(?:[.-]?(\d+))?)?([.-]?dev)?';
 
     /**
      * @param  array<mixed, string>  $versions
      */
-    public function __construct(array $versions = [])
-    {
-        $this->versions = $versions;
-    }
+    public function __construct(
+        private readonly array $versions = [],
+    ) {}
 
     /**
      * Get the most recent stable numbered version from versions passed to
-     * constructor (if any).
-     *
-     * @return string
+     * constructor (if any), or false if there are none.
      */
-    public function getMostRecentStable()
+    public function getMostRecentStable(): string|false
     {
         return $this->selectRecentStable();
     }
 
     /**
      * Get the most recent unstable numbered version from versions passed to
-     * constructor (if any).
-     *
-     * @return string
+     * constructor (if any), or false if there are none.
      */
-    public function getMostRecentUnStable()
+    public function getMostRecentUnStable(): string|false
     {
         return $this->selectRecentUnstable();
     }
 
     /**
      * Get the most recent stable or unstable numbered version from versions passed to
-     * constructor (if any).
-     *
-     * @return string
+     * constructor (if any), or false if there are none.
      */
-    public function getMostRecentAll()
+    public function getMostRecentAll(): string|false
     {
         return $this->selectRecentAll();
     }
 
     /**
      * Checks if given version string represents a stable numbered version.
-     *
-     * @param  string  $version
-     * @return bool
      */
-    public function isStable($version)
+    public function isStable(string $version): bool
     {
         return $this->stable($version);
     }
@@ -80,11 +64,8 @@ class VersionParser
     /**
      * Checks if given version string represents a 'pre-release' version, i.e.
      * it's unstable but not development level.
-     *
-     * @param  string  $version
-     * @return bool
      */
-    public function isPreRelease($version)
+    public function isPreRelease(string $version): bool
     {
         return ! $this->stable($version) && ! $this->development($version);
     }
@@ -92,27 +73,21 @@ class VersionParser
     /**
      * Checks if given version string represents an unstable or dev-level
      * numbered version.
-     *
-     * @param  string  $version
-     * @return bool
      */
-    public function isUnstable($version)
+    public function isUnstable(string $version): bool
     {
         return ! $this->stable($version);
     }
 
     /**
      * Checks if given version string represents a dev-level numbered version.
-     *
-     * @param  string  $version
-     * @return bool
      */
-    public function isDevelopment($version)
+    public function isDevelopment(string $version): bool
     {
         return $this->development($version);
     }
 
-    private function selectRecentStable()
+    private function selectRecentStable(): string|false
     {
         $candidates = [];
         foreach ($this->versions as $version) {
@@ -128,7 +103,7 @@ class VersionParser
         return $this->findMostRecent($candidates);
     }
 
-    private function selectRecentUnstable()
+    private function selectRecentUnstable(): string|false
     {
         $candidates = [];
         foreach ($this->versions as $version) {
@@ -144,7 +119,7 @@ class VersionParser
         return $this->findMostRecent($candidates);
     }
 
-    private function selectRecentAll()
+    private function selectRecentAll(): string|false
     {
         $candidates = [];
         foreach ($this->versions as $version) {
@@ -161,7 +136,7 @@ class VersionParser
     }
 
     /** @param  array<mixed, string>  $candidates */
-    private function findMostRecent(array $candidates)
+    private function findMostRecent(array $candidates): string
     {
         $candidate = '';
         foreach ($candidates as $version) {
@@ -173,13 +148,13 @@ class VersionParser
         return $candidate;
     }
 
-    private function stable($version)
+    private function stable(string $version): bool
     {
-        $version = preg_replace('{#.+$}i', '', $version);
+        $version = preg_replace('{#.+$}i', '', $version) ?? $version;
         if ($this->development($version)) {
             return false;
         }
-        preg_match('{'.$this->modifier.'$}i', strtolower($version), $match);
+        preg_match('{'.self::MODIFIER.'$}i', strtolower($version), $match);
         if (! empty($match[3])) {
             return false;
         }
@@ -194,12 +169,12 @@ class VersionParser
         return true;
     }
 
-    private function development($version)
+    private function development(string $version): bool
     {
-        if (substr($version, 0, 4) === 'dev-' || substr($version, -4) === '-dev') {
+        if (str_starts_with($version, 'dev-') || str_ends_with($version, '-dev')) {
             return true;
         }
-        if (preg_match("/-\d+-[a-z0-9]{8,}$/", $version) == 1) {
+        if (preg_match("/-\d+-[a-z0-9]{8,}$/", $version) === 1) {
             return true;
         }
 
