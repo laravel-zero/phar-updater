@@ -26,6 +26,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
     - [SHA-1 / SHA-256 / SHA-512 Hash Synchronisation](#sha-1--sha-256--sha-512-hash-synchronisation)
     - [Github Releases](#github-releases)
     - [Direct Downloads](#direct-downloads)
+- [Change log](#change-log)
 
 ## Introduction
 
