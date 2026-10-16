@@ -19,10 +19,13 @@ use Humbug\SelfUpdate\Exception\FilesystemException;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\RuntimeException;
+use Humbug\SelfUpdate\Exception\SignatureVerificationException;
+use Humbug\SelfUpdate\Signature\SignatureVerifierInterface;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Strategy\Sha256Strategy;
 use Humbug\SelfUpdate\Strategy\Sha512Strategy;
 use Humbug\SelfUpdate\Strategy\ShaStrategyAbstract;
+use Humbug\SelfUpdate\Strategy\SignedStrategyInterface;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
 
 class Updater
@@ -52,6 +55,8 @@ class Updater
     protected ?string $restorePath = null;
 
     protected ?bool $newVersionAvailable = null;
+
+    protected ?SignatureVerifierInterface $signatureVerifier = null;
 
     public function __construct(?string $localPharFile = null, string $strategy = self::STRATEGY_SHA512)
     {
@@ -123,6 +128,21 @@ class Updater
     }
 
     /**
+     * Set the verifier used to check the downloaded phar's detached signature.
+     * When set, the strategy must implement SignedStrategyInterface, and updates
+     * fail unless the signature is valid.
+     */
+    public function setSignatureVerifier(?SignatureVerifierInterface $verifier): void
+    {
+        $this->signatureVerifier = $verifier;
+    }
+
+    public function getSignatureVerifier(): ?SignatureVerifierInterface
+    {
+        return $this->signatureVerifier;
+    }
+
+    /**
      * Set backup extension for old phar versions.
      */
     public function setBackupExtension(string $extension): void
@@ -158,6 +178,11 @@ class Updater
         return $this->getTempDirectory()
             .'/'
             .sprintf('%s.phar.temp', $this->getLocalPharFileBasename());
+    }
+
+    public function getTempSignatureFile(): string
+    {
+        return $this->getTempPharFile().'.asc';
     }
 
     /**
@@ -308,11 +333,47 @@ class Updater
         }
 
         try {
+            if ($this->signatureVerifier !== null) {
+                $this->verifySignature($this->signatureVerifier);
+            }
             $this->validatePhar($this->getTempPharFile());
         } catch (\Exception $e) {
-            restore_error_handler();
             $this->cleanupAfterError();
             throw $e;
+        }
+    }
+
+    protected function verifySignature(SignatureVerifierInterface $verifier): void
+    {
+        $strategy = $this->getStrategy();
+        if (! $strategy instanceof SignedStrategyInterface) {
+            throw new SignatureVerificationException(sprintf(
+                'A signature verifier is set, but the %s strategy does not implement %s.',
+                $strategy::class,
+                SignedStrategyInterface::class
+            ));
+        }
+
+        $signatureUrl = $strategy->getSignatureUrl();
+        /** Switch remote request errors to HttpRequestExceptions */
+        set_error_handler([$this, 'throwHttpRequestException']);
+        try {
+            $signature = file_get_contents($signatureUrl);
+        } finally {
+            restore_error_handler();
+        }
+        if ($signature === false) {
+            throw new HttpRequestException(sprintf(
+                'Request to URL failed: %s',
+                $signatureUrl
+            ));
+        }
+
+        file_put_contents($this->getTempSignatureFile(), $signature);
+        try {
+            $verifier->verify($this->getTempPharFile(), $this->getTempSignatureFile());
+        } finally {
+            @unlink($this->getTempSignatureFile());
         }
     }
 
@@ -405,9 +466,12 @@ class Updater
         }
         /** Switch invalid phar errors to RuntimeExceptions */
         set_error_handler([$this, 'throwRuntimeException']);
-        /** Opening the phar verifies its internal hash, as phar.require_hash is enabled */
-        $phar = new \Phar($phar);
-        restore_error_handler();
+        try {
+            /** Opening the phar verifies its internal hash, as phar.require_hash is enabled */
+            $phar = new \Phar($phar);
+        } finally {
+            restore_error_handler();
+        }
         unset($phar);
     }
 
@@ -415,5 +479,6 @@ class Updater
     {
         // @unlink($this->getBackupPharFile());
         @unlink($this->getTempPharFile());
+        @unlink($this->getTempSignatureFile());
     }
 }

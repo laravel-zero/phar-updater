@@ -7,11 +7,17 @@ namespace Humbug\SelfUpdate\Strategy;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Updater;
 
-abstract class DirectDownloadStrategyAbstract implements StrategyInterface
+abstract class DirectDownloadStrategyAbstract implements SignedStrategyInterface
 {
     protected string $localVersion;
 
     abstract public function getDownloadUrl(): string;
+
+    #[\Override]
+    public function getSignatureUrl(): string
+    {
+        return $this->getDownloadUrl().'.asc';
+    }
 
     #[\Override]
     public function download(Updater $updater): void

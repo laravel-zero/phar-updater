@@ -21,7 +21,7 @@ use Humbug\SelfUpdate\Updater;
 
 use function file_get_contents;
 
-abstract class ShaStrategyAbstract implements StrategyInterface
+abstract class ShaStrategyAbstract implements SignedStrategyInterface
 {
     private const array SUPPORTED_SCHEMES = [
         'http',
@@ -32,6 +32,8 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     protected string $versionUrl = '';
 
     protected string $pharUrl = '';
+
+    protected string $signatureUrl = '';
 
     #[\Override]
     public function download(Updater $updater): void
@@ -69,6 +71,25 @@ abstract class ShaStrategyAbstract implements StrategyInterface
     public function getPharUrl(): string
     {
         return $this->pharUrl;
+    }
+
+    /**
+     * Set URL to the phar file's detached signature.
+     */
+    public function setSignatureUrl(string $url): void
+    {
+        if (! $this->validateAllowedUrl($url)) {
+            throw new InvalidArgumentException(
+                sprintf('Invalid url passed as argument: %s.', $url)
+            );
+        }
+        $this->signatureUrl = $url;
+    }
+
+    #[\Override]
+    public function getSignatureUrl(): string
+    {
+        return $this->signatureUrl !== '' ? $this->signatureUrl : $this->getPharUrl().'.asc';
     }
 
     /**

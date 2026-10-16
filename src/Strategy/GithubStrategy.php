@@ -18,13 +18,14 @@ namespace Humbug\SelfUpdate\Strategy;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
 use Humbug\SelfUpdate\Exception\JsonParsingException;
+use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Updater;
 use Humbug\SelfUpdate\VersionParser;
 use JsonException;
 
 use function file_get_contents;
 
-class GithubStrategy implements StrategyInterface
+class GithubStrategy implements SignedStrategyInterface
 {
     const string API_URL = 'https://repo.packagist.org/p2/%s.json';
 
@@ -61,6 +62,18 @@ class GithubStrategy implements StrategyInterface
         }
 
         file_put_contents($updater->getTempPharFile(), $result);
+    }
+
+    #[\Override]
+    public function getSignatureUrl(): string
+    {
+        if ($this->remoteUrl === '') {
+            throw new RuntimeException(
+                'The remote version must be resolved before the signature URL is available.'
+            );
+        }
+
+        return $this->remoteUrl.'.asc';
     }
 
     #[\Override]

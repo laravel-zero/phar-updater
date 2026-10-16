@@ -18,6 +18,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
     - [Basic SHA-256 / SHA-512 Strategy](#basic-sha-256--sha-512-strategy)
     - [Github Release Strategy](#github-release-strategy)
     - [Rollback Support](#rollback-support)
+    - [Signature Verification (GPG)](#signature-verification-gpg)
     - [Constructor Parameters](#constructor-parameters)
     - [Check For Updates](#check-for-updates)
     - [Avoid Post Update File Includes](#avoid-post-update-file-includes)
@@ -33,6 +34,7 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
 The `laravel-zero/phar-updater` package has the following features:
 
 * Full support for SSL/TLS verification.
+* Optional verification of detached GPG signatures.
 * Simple API where it either updates or Exceptions will go wild.
 * Support for SHA-256/SHA-512 version synchronisation and Github Releases as update strategies.
 
@@ -202,6 +204,100 @@ try {
 As users may have diverse requirements in naming and locating backups, you can explicitly manage the precise path to
 where a backup should be written, or read from using the `setBackupPath()` function when updating a current phar or the
 `setRestorePath()` prior to triggering a rollback. These will be used instead of the simple built in convention.
+
+### Signature Verification (GPG)
+
+The SHA strategies check that the downloaded phar matches the hash in the version file, but that file is usually hosted
+alongside the phar, so anyone able to replace one can replace the other. To also verify who built the phar, you can sign
+each release with GPG, as [recommended by Box](https://github.com/box-project/box/blob/main/doc/phar-signing.md), and
+have the updater verify the signature before installing an update.
+
+Sign the phar with a detached, ASCII-armored signature, and publish it next to the phar with `.asc` appended:
+
+```bash
+gpg --local-user <key-id> --armor --detach-sign myapp.phar # Creates myapp.phar.asc
+```
+
+Then bundle your public key with your application (for example, in a file included in the phar), and pass it, along
+with the full fingerprint of the signing key, to a `GpgvVerifier`:
+
+```php
+use Humbug\SelfUpdate\Signature\GpgvVerifier;
+use Humbug\SelfUpdate\Updater;
+
+$updater = new Updater();
+$updater->getStrategy()->setPharUrl('https://example.com/myapp.phar');
+$updater->getStrategy()->setVersionUrl('https://example.com/myapp.version');
+$updater->setSignatureVerifier(GpgvVerifier::fromFile(
+    __DIR__.'/../resources/signing-key.asc',
+    '0123 4567 89AB CDEF 0123  4567 89AB CDEF 0123 4567' // The full fingerprint, from `gpg --fingerprint`
+));
+```
+
+When a signature verifier is set, an update is only installed if the signature is valid and was made by the key with
+the given fingerprint. If the signature is missing, invalid or made by any other key, a `SignatureVerificationException`
+or `HttpRequestException` is thrown and the current phar is left in place.
+
+The signature is downloaded from:
+
+* SHA strategies: the phar URL with `.asc` appended, or the URL passed to `setSignatureUrl()`.
+* Github strategy: the phar's release asset with `.asc` appended, e.g. `myapp.phar.asc` in the same release.
+* Direct downloads: the download URL with `.asc` appended, which can be changed by overriding `getSignatureUrl()`.
+
+Custom strategies can support signatures by implementing `Humbug\SelfUpdate\Strategy\SignedStrategyInterface`.
+
+#### Handling Verification Failures
+
+A failed verification can mean two very different things, so it's worth handling them separately in your self-update
+command:
+
+* `GpgvUnavailableException` (a subclass of `SignatureVerificationException`) means GnuPG isn't installed, so the update
+  couldn't be checked at all. Nothing suggests the update has been tampered with, so you may want to offer an explicit,
+  per-run opt-out, such as a `--skip-signature-check` option, which skips calling `setSignatureVerifier()`.
+* Any other `SignatureVerificationException` means the signature is invalid or was made by the wrong key. This is
+  exactly what a tampered release looks like, so don't offer a way to continue (especially not a "continue anyway?"
+  prompt). Instead, tell the user their current version is unchanged and point them to where they can download a release
+  manually.
+
+A missing signature file is reported as an `HttpRequestException`, like any other failed download.
+
+```php
+use Humbug\SelfUpdate\Exception\GpgvUnavailableException;
+use Humbug\SelfUpdate\Exception\SignatureVerificationException;
+use Humbug\SelfUpdate\Signature\GpgvVerifier;
+use Humbug\SelfUpdate\Updater;
+
+$updater = new Updater();
+$updater->getStrategy()->setPharUrl('https://example.com/myapp.phar');
+$updater->getStrategy()->setVersionUrl('https://example.com/myapp.version');
+
+if (! in_array('--skip-signature-check', $argv, true)) {
+    $updater->setSignatureVerifier(GpgvVerifier::fromFile($publicKeyFile, $fingerprint));
+}
+
+try {
+    $result = $updater->update();
+    echo $result ? "Updated!\n" : "No update needed!\n";
+} catch (GpgvUnavailableException $e) {
+    echo "GnuPG (gpgv) is not installed, so this update cannot be verified.\n"
+        ."Install GnuPG, or re-run with --skip-signature-check to update without verification.\n";
+    exit(1);
+} catch (SignatureVerificationException $e) {
+    echo "The update could not be verified and was not installed. Your current version is unchanged.\n"
+        ."If this persists, download the latest release manually from https://example.com/myapp.\n";
+    exit(1);
+}
+```
+
+Please note:
+
+* Verification uses GnuPG's `gpgv` tool, so GnuPG must be installed wherever your application is updated. Signatures
+  are only checked against the public key you provide, never against the user's own keyring.
+* `gpgv` treats the provided key as trusted, and does not check whether it has expired or been revoked. If you need to
+  change your signing key, ship the new key in a release signed by the old key.
+* Signing only protects against a compromised release if the signing key is harder to obtain than the ability to publish
+  a release. If your private key is stored in the same CI secrets that publish releases, an attacker with access to one
+  likely has access to both.
 
 ### Constructor Parameters
 

@@ -13,9 +13,14 @@ declare(strict_types=1);
 
 namespace Humbug\Test\SelfUpdate;
 
+use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
+use Humbug\SelfUpdate\Exception\RuntimeException;
+use Humbug\SelfUpdate\Exception\SignatureVerificationException;
+use Humbug\SelfUpdate\Signature\GpgvVerifier;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Updater;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 class UpdaterGithubStrategyTest extends TestCase
@@ -90,9 +95,7 @@ class UpdaterGithubStrategyTest extends TestCase
         $this->updater->getStrategy()->setStability('foo');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function test_update_phar(): void
     {
         $this->createTestPhar();
@@ -108,7 +111,94 @@ class UpdaterGithubStrategyTest extends TestCase
         $this->assertEquals('new', $this->getPharOutput($this->tmp.'/old.phar'));
     }
 
+    public function test_get_signature_url_throws_exception_before_remote_version_is_resolved(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The remote version must be resolved before the signature URL is available.');
+        (new GithubStrategy)->getSignatureUrl();
+    }
+
+    #[RunInSeparateProcess]
+    public function test_update_phar_with_valid_signature(): void
+    {
+        $this->requireGpgv();
+        $this->createTestPhar();
+        copy($this->files.'/build/new.phar.asc', $this->tmp.'/releases/download/1.0.1/new.phar.asc');
+
+        $updater = $this->createSignedUpdater();
+
+        $this->assertTrue($updater->update());
+        $this->assertSame(
+            'file://'.$this->tmp.'/releases/download/1.0.1/new.phar.asc',
+            $updater->getStrategy()->getSignatureUrl()
+        );
+        $this->assertEquals('new', $this->getPharOutput($this->tmp.'/old.phar'));
+    }
+
+    #[RunInSeparateProcess]
+    public function test_update_phar_fails_if_release_signature_is_invalid(): void
+    {
+        $this->requireGpgv();
+        $this->createTestPhar();
+        copy($this->files.'/gpg/new.phar.other.asc', $this->tmp.'/releases/download/1.0.1/new.phar.asc');
+
+        $this->assertSignedUpdateFails(SignatureVerificationException::class);
+    }
+
+    #[RunInSeparateProcess]
+    public function test_update_phar_fails_if_release_signature_is_missing(): void
+    {
+        $this->requireGpgv();
+        $this->createTestPhar();
+
+        $this->assertSignedUpdateFails(HttpRequestException::class);
+    }
+
     // Helpers
+
+    private function requireGpgv(): void
+    {
+        exec('command -v gpgv', $output, $exitCode);
+        if ($exitCode !== 0) {
+            $this->markTestSkipped('This test requires gpgv (GnuPG) to be installed.');
+        }
+    }
+
+    private function createSignedUpdater(): Updater
+    {
+        $strategy = new GithubTestStrategy;
+        $strategy->setPharName('new.phar');
+        $strategy->setPackageName('humbug/test-phar');
+        $strategy->setCurrentLocalVersion('1.0.0');
+
+        $updater = new Updater($this->tmp.'/old.phar');
+        $updater->setStrategyObject($strategy);
+        $updater->setSignatureVerifier(GpgvVerifier::fromFile(
+            $this->files.'/gpg/test.pubkey.asc',
+            trim((string) file_get_contents($this->files.'/gpg/test.fingerprint'))
+        ));
+
+        return $updater;
+    }
+
+    /**
+     * @param  class-string<\Throwable>  $exception
+     */
+    private function assertSignedUpdateFails(string $exception): void
+    {
+        $updater = $this->createSignedUpdater();
+
+        try {
+            $updater->update();
+            $this->fail('The update should have failed.');
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf($exception, $e, $e->getMessage());
+        }
+
+        $this->assertEquals('old', $this->getPharOutput($this->tmp.'/old.phar'));
+        $this->assertFileDoesNotExist($updater->getTempPharFile());
+        $this->assertFileDoesNotExist($updater->getTempSignatureFile());
+    }
 
     private function getPharOutput(string $path): string
     {
@@ -119,6 +209,7 @@ class UpdaterGithubStrategyTest extends TestCase
     {
         @unlink($this->tmp.'/old.phar');
         @unlink($this->tmp.'/releases/download/1.0.1/new.phar');
+        @unlink($this->tmp.'/releases/download/1.0.1/new.phar.asc');
         @unlink($this->tmp.'/packages.json');
     }
 
