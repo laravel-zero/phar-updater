@@ -5,6 +5,5 @@
     ],
     "main": "src/old/run.php",
     "output": "old.phar",
-    "stub": true,
-    "key": "../privkey.pem"
+    "stub": true
 }

@@ -5,6 +5,5 @@
     ],
     "main": "src/new/run.php",
     "output": "new.phar",
-    "stub": true,
-    "key": "../privkey.pem"
+    "stub": true
 }

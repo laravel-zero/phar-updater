@@ -13,7 +13,7 @@ parameters:
 			path: src/Strategy/Sha512Strategy.php
 
 		-
-			message: '#^Call to function is_bool\(\) with bool will always evaluate to true\.$#'
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Updater.php

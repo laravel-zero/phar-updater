@@ -13,7 +13,6 @@ namespace Humbug\Test\SelfUpdate;
 
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
-use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Strategy\StrategyInterface;
 use Humbug\SelfUpdate\Updater;
 use PHPUnit\Framework\TestCase;
@@ -43,28 +42,22 @@ class UpdaterTest extends TestCase
 
     public function test_construction(): void
     {
-        // with key
         $updater = new Updater($this->files.'/test.phar');
         $this->assertEquals($updater->getLocalPharFile(), $this->files.'/test.phar');
-        $this->assertEquals($updater->getLocalPubKeyFile(), $this->files.'/test.phar.pubkey');
-
-        // without key
-        $updater = new Updater($this->files.'/test.phar', false);
-        $this->assertEquals($updater->getLocalPharFile(), $this->files.'/test.phar');
-        $this->assertNull($updater->getLocalPubKeyFile());
 
         // no name - detect running console app
-        $updater = new Updater(null, false);
+        $updater = new Updater;
         $this->assertStringEndsWith(
             'phpunit.phar',
             basename($updater->getLocalPharFile(), '.phar').'.phar'
         );
     }
 
-    public function test_constructor_throws_exception_if_pub_key_not_exists_but_flag_true(): void
+    public function test_constructor_throws_exception_if_removed_pub_key_flag_is_passed(): void
     {
-        $this->expectException(RuntimeException::class);
-        new Updater($this->files.'/test-nopubkey.phar');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The $hasPubKey parameter has been removed');
+        new Updater($this->files.'/test.phar', false);
     }
 
     public function test_constructor_ancilliary_values(): void
@@ -132,11 +125,7 @@ class UpdaterTest extends TestCase
      */
     public function test_update_phar(): void
     {
-        if (! extension_loaded('openssl')) {
-            $this->markTestSkipped('This test requires the openssl extension to run.');
-        }
-
-        $this->createTestPharAndKey();
+        $this->createTestPhar();
         $this->assertEquals('old', $this->getPharOutput($this->tmp.'/old.phar'));
 
         $updater = new Updater($this->tmp.'/old.phar');
@@ -149,70 +138,28 @@ class UpdaterTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function test_update_phar_fails_if_current_public_key_empty(): void
+    public function test_update_phar_fails_if_download_phar_is_tampered(): void
     {
-        // $this->markTestSkipped('Segmentation fault at present under PHP');
-        copy($this->files.'/build/badkey.phar', $this->tmp.'/old.phar');
-        chmod($this->tmp.'/old.phar', 0755);
-        copy($this->files.'/build/badkey.phar.pubkey', $this->tmp.'/old.phar.pubkey');
+        $this->createTestPhar();
+
+        /** The version hash matches, but the phar's internal signature does not */
+        $this->expectException(UnexpectedValueException::class);
 
         $updater = new Updater($this->tmp.'/old.phar');
-        $updater->getStrategy()->setPharUrl('file://'.$this->files.'/build/new.phar');
-        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/new.version');
+        $updater->getStrategy()->setPharUrl('file://'.$this->files.'/build/tampered.phar');
+        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/tampered.version');
 
-        $this->expectException(UnexpectedValueException::class);
-        $updater->update();
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function test_update_phar_fails_if_current_public_key_invalid(): void
-    {
-        $this->markTestIncomplete('Segmentation fault at present under PHP');
-        /** Should be similar to testUpdatePharFailsIfCurrentPublicKeyEmpty with
-         * corrupt or truncated public key */
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function test_update_phar_fails_on_expected_signature_mismatch(): void
-    {
-        if (! extension_loaded('openssl')) {
-            $this->markTestSkipped('This test requires the openssl extension to run.');
+        try {
+            $updater->update();
+        } finally {
+            $this->assertEquals('old', $this->getPharOutput($this->tmp.'/old.phar'));
+            $this->assertFileDoesNotExist($updater->getTempPharFile());
         }
-
-        $this->createTestPharAndKey();
-        $this->assertEquals('old', $this->getPharOutput($this->tmp.'/old.phar'));
-
-        /** Signature check should fail with invalid signature by a different privkey */
-        $this->expectException(UnexpectedValueException::class);
-
-        $updater = new Updater($this->tmp.'/old.phar');
-        $updater->getStrategy()->setPharUrl('file://'.$this->files.'/build/badsig.phar');
-        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/badsig.version');
-        $updater->update();
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function test_update_phar_fails_if_download_phar_is_unsigned_when_expected(): void
-    {
-        $this->createTestPharAndKey();
-        $updater = new Updater($this->tmp.'/old.phar');
-        $updater->getStrategy()->setPharUrl('file://'.$this->files.'/build/nosig.phar');
-        $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/nosig.version');
-
-        /** If newly download phar lacks an expected signature, an exception should be thrown */
-        $this->expectException(RuntimeException::class);
-        $updater->update();
     }
 
     public function test_set_backup_path_sets_the_path_when_the_directory_exists_and_is_writeable(): void
     {
-        $this->createTestPharAndKey();
+        $this->createTestPhar();
         $updater = new Updater($this->tmp.'/old.phar');
         $updater->setBackupPath($this->tmp.'/backup.phar');
         $res = $updater->getBackupPath();
@@ -221,7 +168,7 @@ class UpdaterTest extends TestCase
 
     public function test_set_restore_path_sets_the_path_when_the_directory_exists_and_is_writeable(): void
     {
-        $this->createTestPharAndKey();
+        $this->createTestPhar();
         $updater = new Updater($this->tmp.'/old.phar');
         $updater->setRestorePath($this->tmp.'/backup.phar');
         $res = $updater->getRestorePath();
@@ -247,18 +194,12 @@ class UpdaterTest extends TestCase
     private function deleteTempPhars(): void
     {
         @unlink($this->tmp.'/old.phar');
-        @unlink($this->tmp.'/old.phar.pubkey');
-        @unlink($this->tmp.'/old.1c7049180abee67826d35ce308c38272242b64b8.phar');
     }
 
-    private function createTestPharAndKey(): void
+    private function createTestPhar(): void
     {
         copy($this->files.'/build/old.phar', $this->tmp.'/old.phar');
         chmod($this->tmp.'/old.phar', 0755);
-        copy(
-            $this->files.'/build/old.phar.pubkey',
-            $this->tmp.'/old.phar.pubkey'
-        );
     }
 }
 

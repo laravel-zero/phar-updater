@@ -30,7 +30,7 @@ class UpdaterSha256StrategyTest extends TestCase
     {
         $this->tmp = sys_get_temp_dir();
         $this->files = __DIR__.'/_files';
-        $this->updater = new Updater($this->files.'/test.phar', true, Updater::STRATEGY_SHA256);
+        $this->updater = new Updater($this->files.'/test.phar', Updater::STRATEGY_SHA256);
     }
 
     protected function teardown(): void
@@ -40,7 +40,7 @@ class UpdaterSha256StrategyTest extends TestCase
 
     public function test_construction(): void
     {
-        $updater = new Updater(null, false, Updater::STRATEGY_SHA256);
+        $updater = new Updater(null, Updater::STRATEGY_SHA256);
         $this->assertInstanceOf(Sha256Strategy::class, $updater->getStrategy());
     }
 
@@ -117,10 +117,10 @@ class UpdaterSha256StrategyTest extends TestCase
      */
     public function test_update_phar(): void
     {
-        $this->createTestPharAndKey();
+        $this->createTestPhar();
         $this->assertEquals('old', $this->getPharOutput($this->tmp.'/old.phar'));
 
-        $updater = new Updater($this->tmp.'/old.phar', true, Updater::STRATEGY_SHA256);
+        $updater = new Updater($this->tmp.'/old.phar', Updater::STRATEGY_SHA256);
         $updater->getStrategy()->setPharUrl('file://'.$this->files.'/build/new.phar');
         $updater->getStrategy()->setVersionUrl('file://'.$this->files.'/build/new.sha256.version');
         $this->assertTrue($updater->update());
@@ -137,18 +137,12 @@ class UpdaterSha256StrategyTest extends TestCase
     private function deleteTempPhars(): void
     {
         @unlink($this->tmp.'/old.phar');
-        @unlink($this->tmp.'/old.phar.pubkey');
-        @unlink($this->tmp.'/old.phar.temp.pubkey');
         @unlink($this->tmp.'/old-old.phar');
     }
 
-    private function createTestPharAndKey(): void
+    private function createTestPhar(): void
     {
         copy($this->files.'/build/old.phar', $this->tmp.'/old.phar');
         chmod($this->tmp.'/old.phar', 0755);
-        copy(
-            $this->files.'/build/old.phar.pubkey',
-            $this->tmp.'/old.phar.pubkey'
-        );
     }
 }

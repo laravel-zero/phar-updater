@@ -32,7 +32,6 @@ The backend for the self-update command in Laravel Zero PHARs. Originally create
 The `laravel-zero/phar-updater` package has the following features:
 
 * Full support for SSL/TLS verification.
-* Support for OpenSSL phar signatures.
 * Simple API where it either updates or Exceptions will go wild.
 * Support for SHA-1/SHA-256/SHA-512 version synchronisation and Github Releases as update strategies.
 
@@ -71,8 +70,7 @@ this.
 
 ```php
 /**
- * The simplest usage assumes the currently running phar is to be updated and
- * that it has been signed with a private key (using OpenSSL).
+ * The simplest usage assumes the currently running phar is to be updated.
  *
  * The first constructor parameter is the path to a phar if you are not updating
  * the currently running phar.
@@ -85,28 +83,6 @@ $updater = new Updater();
 // Add the below to use the SHA-256 strategy. It will default to SHA-1 if excluded.
 $updater->setStrategy(Updater::STRATEGY_SHA256);
 
-$updater->getStrategy()->setPharUrl('https://example.com/current.phar');
-$updater->getStrategy()->setVersionUrl('https://example.com/current.version');
-try {
-    $result = $updater->update();
-    echo $result ? "Updated!\n" : "No update needed!\n";
-} catch (\Exception $e) {
-    echo "Well, something happened! Either an oopsie or something involving hackers.\n";
-    exit(1);
-}
-```
-
-If you are not signing the phar using OpenSSL:
-
-```php
-/**
- * The second parameter to the constructor must be false if your phars are
- * not signed using OpenSSL.
- */
-
-use Humbug\SelfUpdate\Updater;
-
-$updater = new Updater(null, false);
 $updater->getStrategy()->setPharUrl('https://example.com/current.phar');
 $updater->getStrategy()->setVersionUrl('https://example.com/current.version');
 try {
@@ -231,30 +207,23 @@ The Updater constructor is fairly simple. The three basic variations are:
 
 ```php
 /**
- * Default: Update currently running phar which has been signed.
+ * Default: Update currently running phar.
  */
 $updater = new Updater;
 ```
 
 ```php
 /**
- * Update currently running phar which has NOT been signed.
- */
-$updater = new Updater(null, false);
-```
-
-```php
-/**
  * Use a strategy other than the default SHA Hash.
  */
-$updater = new Updater(null, false, Updater::STRATEGY_GITHUB);
+$updater = new Updater(null, Updater::STRATEGY_GITHUB);
 ```
 
 ```php
 /**
- * Update a different phar which has NOT been signed.
+ * Update a different phar.
  */
-$updater = new Updater('/path/to/impersonatephil.phar', false);
+$updater = new Updater('/path/to/impersonatephil.phar');
 ```
 
 ### Check For Updates
@@ -272,11 +241,8 @@ use Humbug\SelfUpdate\Updater;
  * Configuration is identical in every way for actual updates. You can run this
  * across multiple configuration variants to get recent stable, unstable, and dev
  * versions available.
- *
- * This would configure update for an unsigned phar (second constructor must be
- * false in this case).
  */
-$updater = new Updater(null, false);
+$updater = new Updater();
 $updater->setStrategy(Updater::STRATEGY_GITHUB);
 $updater->getStrategy()->setPackageName('myvendor/myapp');
 $updater->getStrategy()->setPharName('myapp.phar');
@@ -320,7 +286,7 @@ implement `Humbug\SelfUpdate\Strategy\StrategyInterface`
 and pass a new instance of your implementation post-construction.
 
 ```php
-$updater = new Updater(null, false);
+$updater = new Updater();
 $updater->setStrategyObject(new MyStrategy);
 ```
 
@@ -331,11 +297,10 @@ The similar `setStrategy()` method is solely used to pass flags matching interna
 ### SHA-1 / SHA-256 / SHA-512 Hash Synchronisation
 
 The phar-updater package supports an update strategy where phars are updated according to the SHA-1, SHA-256, or SHA-512
-hash of the current PHAR file available remotely. This assumes the existence of only two to three remote files:
+hash of the current PHAR file available remotely. This assumes the existence of only two remote files:
 
 * myname.phar
 * myname.version
-* myname.phar.pubkey (optional)
 
 The `myname.phar` is the most recently built phar.
 
@@ -357,16 +322,6 @@ Remember to regenerate the version file for each new phar build you want to dist
 adds additional data after the hash, but it's fine since the hash is the first string in the file which is the only
 requirement.
 
-If using OpenSSL signing, which is very much recommended, you can also put the public key online as `myname.phar.pubkey`
-, for the initial installation of your phar. However, please note that phar-updater itself will never download this key,
-will never replace this key on your filesystem, and will never install a phar whose signature cannot be verified by the
-locally cached public key.
-
-If you need to switch keys for any reason whatsoever, users will need to manually download a new phar along with the new
-key. While that sounds extreme, it's generally not a good idea to allow for arbitrary key changes that occur without
-user knowledge. The openssl signing has no mechanism such as a central authority, or a browser's trusted certificate
-stash with which to automate such key changes in a safe manner.
-
 ### Github Releases
 
 When tagging new versions on Github, these are created and hosted as `Github Releases`
@@ -377,9 +332,7 @@ Taking advantage of this architecture, the Github Strategy for updating phars ca
 version against remote release versions and update to the most recent stable (or unstable) version from Github.
 
 At present, it's assume that phar files all bear the same name across releases, i.e. just a plain name like `myapp.phar`
-without versioning information in the file name. You can also upload your phar's public key in the same way. Using the
-established convention of being the phar name with `.pubkey` appended, e.g.
-`myapp.phar` would be matched with `myapp.phar.pubkey`.
+without versioning information in the file name.
 
 You can read more about Github releases [here](https://help.github.com/articles/creating-releases).
 
@@ -432,3 +385,7 @@ class ExampleDirectDownloadStrategy extends DirectDownloadStrategyAbstract
 
 You can also set and retrieve the current local version using the `setCurrentLocalVersion()` and `getCurrentLocalVersion()`
 methods, which will be used for comparison with the remote version.
+
+## Change log
+
+Please see [GitHub Releases](https://github.com/laravel-zero/phar-updater/releases) for more information on what has changed recently.

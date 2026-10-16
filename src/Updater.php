@@ -16,7 +16,6 @@ namespace Humbug\SelfUpdate;
 use Humbug\SelfUpdate\Exception\FilesystemException;
 use Humbug\SelfUpdate\Exception\HttpRequestException;
 use Humbug\SelfUpdate\Exception\InvalidArgumentException;
-use Humbug\SelfUpdate\Exception\NoSignatureException;
 use Humbug\SelfUpdate\Exception\RuntimeException;
 use Humbug\SelfUpdate\Strategy\GithubStrategy;
 use Humbug\SelfUpdate\Strategy\Sha256Strategy;
@@ -49,16 +48,6 @@ class Updater
      * @var string
      */
     protected $localPharFileBasename;
-
-    /**
-     * @var string
-     */
-    protected $localPubKeyFile;
-
-    /**
-     * @var bool
-     */
-    protected $hasPubKey;
 
     /**
      * @var string
@@ -99,23 +88,18 @@ class Updater
      * Constructor.
      *
      * @param  string  $localPharFile
-     * @param  bool  $hasPubKey
      * @param  string  $strategy
      */
-    public function __construct($localPharFile = null, $hasPubKey = true, $strategy = self::STRATEGY_SHA1)
+    public function __construct($localPharFile = null, $strategy = self::STRATEGY_SHA1)
     {
+        if (! is_string($strategy)) {
+            throw new InvalidArgumentException(
+                'Constructor parameter $strategy must be a string. The $hasPubKey '
+                    .'parameter has been removed, as OpenSSL signing is no longer supported.'
+            );
+        }
         ini_set('phar.require_hash', '1');
         $this->setLocalPharFile($localPharFile);
-        if (! is_bool($hasPubKey)) {
-            throw new InvalidArgumentException(
-                'Constructor parameter $hasPubKey must be boolean or null.'
-            );
-        } else {
-            $this->hasPubKey = $hasPubKey;
-        }
-        if ($this->hasPubKey) {
-            $this->setLocalPubKeyFile();
-        }
         $this->setTempDirectory();
         $this->setStrategy($strategy);
     }
@@ -228,11 +212,6 @@ class Updater
         return $this->localPharFileBasename;
     }
 
-    public function getLocalPubKeyFile()
-    {
-        return $this->localPubKeyFile;
-    }
-
     public function getTempDirectory()
     {
         return $this->tempDirectory;
@@ -337,11 +316,6 @@ class Updater
         }
 
         throw new HttpRequestException($errstr);
-    }
-
-    protected function hasPubKey()
-    {
-        return $this->hasPubKey;
     }
 
     protected function newVersionAvailable()
@@ -458,13 +432,6 @@ class Updater
             );
     }
 
-    protected function getTempPubKeyFile()
-    {
-        return $this->getTempDirectory()
-            .'/'
-            .sprintf('%s.phar.temp.pubkey', $this->getLocalPharFileBasename());
-    }
-
     protected function setLocalPharFile($localPharFile)
     {
         if (! is_null($localPharFile)) {
@@ -488,18 +455,6 @@ class Updater
         $this->localPharFileBasename = basename($localPharFile, '.phar');
     }
 
-    protected function setLocalPubKeyFile()
-    {
-        $localPubKeyFile = $this->getLocalPharFile().'.pubkey';
-        if (! file_exists($localPubKeyFile)) {
-            throw new RuntimeException(sprintf(
-                'The phar pubkey file does not exist: %s.',
-                $localPubKeyFile
-            ));
-        }
-        $this->localPubKeyFile = $localPubKeyFile;
-    }
-
     protected function setTempDirectory()
     {
         $tempDirectory = dirname($this->getLocalPharFile());
@@ -515,23 +470,12 @@ class Updater
     protected function validatePhar($phar)
     {
         $phar = realpath($phar);
-        if ($this->hasPubKey()) {
-            copy($this->getLocalPubKeyFile(), $phar.'.pubkey');
-        }
         chmod($phar, fileperms($this->getLocalPharFile()));
-        /** Switch invalid key errors to RuntimeExceptions */
+        /** Switch invalid phar errors to RuntimeExceptions */
         set_error_handler([$this, 'throwRuntimeException']);
+        /** Opening the phar verifies its internal hash, as phar.require_hash is enabled */
         $phar = new \Phar($phar);
-        $signature = $phar->getSignature();
-        if ($this->hasPubKey() && strtolower($signature['hash_type']) !== 'openssl') {
-            throw new NoSignatureException(
-                'The downloaded phar file has no OpenSSL signature.'
-            );
-        }
         restore_error_handler();
-        if ($this->hasPubKey()) {
-            @unlink($phar.'.pubkey');
-        }
         unset($phar);
     }
 
@@ -539,6 +483,5 @@ class Updater
     {
         // @unlink($this->getBackupPharFile());
         @unlink($this->getTempPharFile());
-        @unlink($this->getTempPubKeyFile());
     }
 }
